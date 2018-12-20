@@ -88,8 +88,8 @@ func SetupLogger(logFilePath string, useStdio bool) (logger *log.Logger, err err
 			w = f
 		}
 	}
-	logger = log.New(w, serviceName+":", log.LstdFlags)
-	logger.Println(serviceName, "starting")
+	logger = log.New(w, ServiceName+":", log.LstdFlags)
+	logger.Println(ServiceName, "starting")
 	return logger, nil
 }
 func SetupListener(listenNetwork, listenAddress string) (net.Listener, error) {
@@ -126,5 +126,5 @@ func LoadDefaultCarService() (car.Service, error) {
 	return car.NewGeneralServiceHandler(c), nil
 }
 func LoadFakeCarSevice() (car.Service, error) {
-	return car.NewGeneralServiceHandler(NewFakeCar(logger)), nil
+	return car.NewGeneralServiceHandler(NewFakeCar(Logger)), nil
 }

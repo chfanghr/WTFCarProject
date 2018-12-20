@@ -11,8 +11,8 @@ import (
 	"time"
 )
 
-var serviceName = "backendService"
-var logger *log.Logger
+var ServiceName = "backendService"
+var Logger *log.Logger
 var CleanUpFuncs *CleanUpHandlerArray
 
 func main() {
@@ -24,57 +24,57 @@ func main() {
 	listenNetwork := flag.String("listenNetwork", "tcp", "rpc server listen to which type of network")
 	listenAddress := flag.String("listenAddress", ":8888", "rpc server listen to which address")
 	networkTimeout := flag.Duration("networkTimeout", time.Second*5, "connection timeout")
-	flag.StringVar(&serviceName, "serviceName", serviceName, "name of rpc service")
+	flag.StringVar(&ServiceName, "serviceName", ServiceName, "name of rpc service")
 	flag.Parse()
 
 	var err error
-	logger, err = SetupLogger(*logFilePath, !*closeStdio)
+	Logger, err = SetupLogger(*logFilePath, !*closeStdio)
 	if err != nil {
 		log.SetFlags(log.LstdFlags)
-		log.Fatalln("error occur while setting up logger :", err)
+		log.Fatalln("error occur while setting up Logger :", err)
 	}
-	CleanUpFuncs = NewCleanUpHandlerArray(logger)
+	CleanUpFuncs = NewCleanUpHandlerArray(Logger)
 
 	if *daemonize {
-		logger.Println("setting up daemon")
+		Logger.Println("setting up daemon")
 		_, err := daemon(0, 0)
 		if err != nil {
-			logger.Fatalln("error occur while setting up daemon :", err)
+			Logger.Fatalln("error occur while setting up daemon :", err)
 		}
 	}
 
-	logger.Println("setting up pid file")
+	Logger.Println("setting up pid file")
 	err = SetupPidFile(*pidFilePath)
 	if err != nil {
-		logger.Fatalln("error occur while setting up pid file :", err)
+		Logger.Fatalln("error occur while setting up pid file :", err)
 	}
 
 	CleanUpFuncs.Add(raspi.CleanUpHandler)
 
-	logger.Println("loading carService")
+	Logger.Println("loading carService")
 	carService, err := LoadCarService(*configFile)
-	//carService := car.Service(car.NewGeneralServiceHandler(NewFakeCar(logger)))
+	//carService := car.Service(car.NewGeneralServiceHandler(NewFakeCar(Logger)))
 	if err != nil {
-		logger.Fatalln("error occur while loading carService :", err)
+		Logger.Fatalln("error occur while loading carService :", err)
 	}
 	if carService == nil {
-		logger.Fatalln("car.Service should not be nil,panic")
+		Logger.Fatalln("car.Service should not be nil,panic")
 	}
 
-	logger.Println("register rpc service")
-	err = rpc.RegisterName(serviceName, carService)
+	Logger.Println("register rpc service")
+	err = rpc.RegisterName(ServiceName, carService)
 	if err != nil {
-		logger.Fatalln("error occur while register rpc service :", err)
+		Logger.Fatalln("error occur while register rpc service :", err)
 	}
 
-	logger.Println("setting up listener")
+	Logger.Println("setting up listener")
 	l, err := SetupListener(*listenNetwork, *listenAddress)
 	if err != nil {
-		logger.Fatalln("error occur while setting up listener :", err)
+		Logger.Fatalln("error occur while setting up listener :", err)
 	}
 
-	logger.Println("service is up")
-	logger.Println("listen on :", l.Addr().String())
+	Logger.Println("service is up")
+	Logger.Println("listen on :", l.Addr().String())
 	//getDeadline := func() time.Time { return time.Now().Add(*networkTimeout) }
 
 	go func() {
@@ -97,13 +97,13 @@ func main() {
 			default:
 			}
 			if err != nil {
-				logger.Println("error occur while accepting connection :", err)
+				Logger.Println("error occur while accepting connection :", err)
 				if conn != nil {
 					conn.Close()
 				}
 				continue
 			}
-			logger.Println("connection accepted :", conn.RemoteAddr())
+			Logger.Println("connection accepted :", conn.RemoteAddr())
 			select {
 			case <-ch:
 				return
@@ -111,7 +111,7 @@ func main() {
 			}
 			connKeepAlive, err := conn, tcpkeepalive.SetKeepAlive(conn, *networkTimeout, 4, time.Second)
 			if err != nil {
-				logger.Println("error occur while setting up connection :", err)
+				Logger.Println("error occur while setting up connection :", err)
 				if connKeepAlive != nil {
 					connKeepAlive.Close()
 				}
@@ -120,7 +120,7 @@ func main() {
 			go func() {
 				defer func() {
 					if connKeepAlive != nil {
-						logger.Println("connection closed :", connKeepAlive.RemoteAddr())
+						Logger.Println("connection closed :", connKeepAlive.RemoteAddr())
 						connKeepAlive.Close()
 					}
 				}()
@@ -129,7 +129,7 @@ func main() {
 					return
 				default:
 				}
-				logger.Println("serve connection :", connKeepAlive.RemoteAddr())
+				Logger.Println("serve connection :", connKeepAlive.RemoteAddr())
 				rpc.ServeCodec(jsonrpc.NewServerCodec(connKeepAlive))
 			}()
 		}
