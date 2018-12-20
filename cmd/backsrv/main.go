@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/chfanghr/backend/car"
 	"github.com/chfanghr/backend/raspi"
 	"github.com/felixge/tcpkeepalive"
 	"log"
@@ -18,7 +17,7 @@ var CleanUpFuncs *CleanUpHandlerArray
 
 func main() {
 	pidFilePath := flag.String("pidFile", fmt.Sprint(""), "path to pid file")
-	//configFile := flag.String("configFile", "", "path to config file")
+	configFile := flag.String("configFile", "", "path to config file")
 	logFilePath := flag.String("logFile", "", "path to log file")
 	daemonize := flag.Bool("daemonize", false, "daemonize or not")
 	closeStdio := flag.Bool("closeStdio", false, "daemon close stdio or not")
@@ -53,8 +52,8 @@ func main() {
 	CleanUpFuncs.Add(raspi.CleanUpHandler)
 
 	logger.Println("loading carService")
-	//carService, err := LoadCarService(*configFile)
-	carService := car.Service(car.NewGeneralServiceHandler(NewFakeCar(logger)))
+	carService, err := LoadCarService(*configFile)
+	//carService := car.Service(car.NewGeneralServiceHandler(NewFakeCar(logger)))
 	if err != nil {
 		logger.Fatalln("error occur while loading carService :", err)
 	}
@@ -92,6 +91,11 @@ func main() {
 			default:
 			}
 			conn, err := l.Accept()
+			select {
+			case <-ch:
+				return
+			default:
+			}
 			if err != nil {
 				logger.Println("error occur while accepting connection :", err)
 				if conn != nil {

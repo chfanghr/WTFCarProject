@@ -23,7 +23,9 @@ const (
 	DefaultMotorBIN2 hardware.PinNumber = 9
 	DefaultIRPin     hardware.PinNumber = 11
 
-	DefaultIBeaconDeviceName string = "Car"
+	DefaultBluetoothHost string = "hci0"
+	DefaultIBeaconName   string = "Car"
+	DefaultIbeaconUUID   string = "c3468b29-38a3-4d80-a921-908450fcdd0e"
 )
 
 type Config struct {
@@ -36,7 +38,9 @@ type Config struct {
 	MotorBIN2 hardware.PinNumber `json:"motor_B2"`
 	IRPin     hardware.PinNumber `json:"ir_pin"`
 
-	SerialIBeacon string `json:"serial_ibeacon"`
+	BluetoothHost string `json:"bluetooth_host"`
+	IBeaconName   string `json:"iBeacon_name"`
+	IBeaconUUID   string `json:"iBeacon_uuid"`
 }
 
 func SetupPidFile(pidFilePath string) error {
@@ -103,20 +107,24 @@ func LoadCarService(configFile string) (car.Service, error) {
 		if err != nil {
 			return nil, err
 		}
-		ca, err := NewCar(c.I2CAddr, c.I2CBus, c.MotorAIN1, c.MotorAIN2, c.MotorBIN1, c.MotorBIN2, c.IRPin, c.SerialIBeacon)
+		ca, err := NewCar(c.I2CAddr, c.I2CBus, c.MotorAIN1, c.MotorAIN2, c.MotorBIN1, c.MotorBIN2, c.IRPin, c.BluetoothHost, c.IBeaconName, c.IBeaconUUID)
 		if err != nil {
 			return nil, err
 		}
 		return car.NewGeneralServiceHandler(ca), nil
 	} else {
-		return LoadDefaultCarService()
+		//return LoadDefaultCarService()
+		return LoadFakeCarSevice()
 	}
 	return nil, errors.New("unknown error")
 }
 func LoadDefaultCarService() (car.Service, error) {
-	c, err := NewCar(DefaultI2CAddr, DefaultI2CBus, DefaultMotorAIN1, DefaultMotorAIN2, DefaultMotorBIN1, DefaultMotorBIN2, DefaultIRPin, DefaultIBeaconDeviceName)
+	c, err := NewCar(DefaultI2CAddr, DefaultI2CBus, DefaultMotorAIN1, DefaultMotorAIN2, DefaultMotorBIN1, DefaultMotorBIN2, DefaultIRPin, DefaultBluetoothHost, DefaultIBeaconName, DefaultIbeaconUUID)
 	if err != nil {
 		return nil, err
 	}
 	return car.NewGeneralServiceHandler(c), nil
+}
+func LoadFakeCarSevice() (car.Service, error) {
+	return car.NewGeneralServiceHandler(NewFakeCar(logger)), nil
 }

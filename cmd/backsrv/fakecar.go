@@ -19,7 +19,7 @@ func NewFakeCar(l *log.Logger) *FakeCar {
 }
 func (f *FakeCar) GetLocation() (location.Point2D, error) {
 	f.l.Println("FakeCar.GetLocation() called")
-	return *location.NewPoint2d(rand.Float64(), rand.Float64()), nil
+	return *location.NewPoint2D(rand.Float64(), rand.Float64()), nil
 }
 func (f *FakeCar) MoveTo(l location.Point2D) error {
 	f.l.Println("FakeCar.MoveTo() called:", l)

@@ -6,7 +6,7 @@ type Point2D struct {
 	x, y float64
 }
 
-func NewPoint2d(x float64, y float64) *Point2D {
+func NewPoint2D(x float64, y float64) *Point2D {
 	return &Point2D{x: x, y: y}
 }
 

@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/chfanghr/backend/a4950"
 	"github.com/chfanghr/backend/arduino"
+	"github.com/chfanghr/backend/car"
 	"github.com/chfanghr/backend/generalgpio"
 	"github.com/chfanghr/backend/generalir"
 	"github.com/chfanghr/backend/hardware"
@@ -21,7 +22,7 @@ type Car struct {
 }
 
 func NewCar(I2CAddr uint8, I2CBus int, MotorAIN1 hardware.PinNumber, MotorAIN2 hardware.PinNumber,
-	MotorBIN1 hardware.PinNumber, MotorBIN2 hardware.PinNumber, IRPin hardware.PinNumber, SerialIBeacon string) (*Car, error) {
+	MotorBIN1 hardware.PinNumber, MotorBIN2 hardware.PinNumber, IRPin hardware.PinNumber, BluetoothHost string, IBeaconName string, IBeaconUUID string) (*Car, error) {
 	c := &Car{m: new(sync.Mutex)}
 	dev, err := raspi.NewI2C(I2CAddr, I2CBus)
 	if err != nil {
@@ -38,7 +39,7 @@ func NewCar(I2CAddr uint8, I2CBus int, MotorAIN1 hardware.PinNumber, MotorAIN2 h
 	c.MA = a4950.NewA4950(MA1, MA2)
 	c.MB = a4950.NewA4950(MB1, MB2)
 	c.ir = generalir.NewGeneralIR(c.a, IRPin)
-
+	c.le = location.NewFakeLocationEngine()
 	return c, nil
 }
 func (c *Car) withMutex(job func() (interface{}, error)) (interface{}, error) {
@@ -47,14 +48,23 @@ func (c *Car) withMutex(job func() (interface{}, error)) (interface{}, error) {
 	res, err := job()
 	return res, err
 }
-func (*Car) GetLocation() (location.Point2D, error) {
-	panic("implement me")
+func (c *Car) GetLocation() (location.Point2D, error) {
+	res, err := c.withMutex(func() (i interface{}, e error) {
+		return c.le.GetLocation()
+	})
+	return res.(location.Point2D), err
 }
-func (*Car) MoveTo(location.Point2D) error {
-	panic("implement me")
+func (c *Car) MoveTo(location.Point2D) error {
+	_, err := c.withMutex(func() (i interface{}, e error) {
+		return nil, nil
+	})
+	return err
 }
-func (*Car) LastMovementStatus() int {
-	panic("implement me")
+func (c *Car) LastMovementStatus() int {
+	res, _ := c.withMutex(func() (i interface{}, e error) {
+		return car.Succeeded, nil
+	})
+	return res.(int)
 }
 func (c *Car) StopMovement() error {
 	_, err := c.withMutex(func() (i interface{}, e error) {

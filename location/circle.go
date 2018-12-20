@@ -39,7 +39,7 @@ func (c Circle) GetR() float64 {
 
 func (c Circle) GetSamplePoints() (res []Point2D) {
 	for i := float64(0); i <= 360; i += 20.0 {
-		res = append(res, *NewPoint2d(math.Cos(i)*c.r+c.c.x, math.Sin(i)*c.r+c.c.y))
+		res = append(res, *NewPoint2D(math.Cos(i)*c.r+c.c.x, math.Sin(i)*c.r+c.c.y))
 	}
 	return
 }

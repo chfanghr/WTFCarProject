@@ -15,5 +15,5 @@ func Point2DFromLocationPoint2D(d location.Point2D) *Point2D {
 }
 
 func Point2DToLocationPoint2D(d Point2D) *location.Point2D {
-	return location.NewPoint2d(d.X, d.Y)
+	return location.NewPoint2D(d.X, d.Y)
 }

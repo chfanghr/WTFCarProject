@@ -43,7 +43,7 @@ func (s *GeneralServiceHandler) GetLocation(nouse int, d *rpcprotocal.Point2D) e
 }
 func (s *GeneralServiceHandler) MoveTo(d rpcprotocal.Point2D, rep *int) error {
 	return s.withMutex(func() error {
-		go s.c.MoveTo(*location.NewPoint2d(d.X, d.Y))
+		go s.c.MoveTo(*location.NewPoint2D(d.X, d.Y))
 		*rep = Moving
 		return operationSucceeded
 	})
