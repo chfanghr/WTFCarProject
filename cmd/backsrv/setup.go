@@ -97,6 +97,7 @@ func SetupListener(listenNetwork, listenAddress string) (net.Listener, error) {
 }
 func LoadCarService(configFile string) (car.Service, error) {
 	if len(configFile) > 0 {
+		Logger.Println("load from config file")
 		buf, err := ioutil.ReadFile(configFile)
 		if err != nil {
 			return nil, err
@@ -114,6 +115,7 @@ func LoadCarService(configFile string) (car.Service, error) {
 		return car.NewGeneralServiceHandler(ca), nil
 	} else {
 		//return LoadDefaultCarService()
+		Logger.Println("load fake car")
 		return LoadFakeCarSevice()
 	}
 	return nil, errors.New("unknown error")
