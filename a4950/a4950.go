@@ -1,0 +1,132 @@
+package a4950
+
+import (
+	"github.com/chfanghr/backend/hardware"
+	"sync"
+	"time"
+)
+
+const FOREVER = time.Duration(0)
+
+func NewA4950(IN1, IN2 hardware.PWMPin) *A4950 {
+	return &A4950{
+		m:  new(sync.Mutex),
+		i1: IN1,
+		i2: IN2,
+	}
+}
+
+type A4950 struct {
+	m      sync.Locker
+	i1, i2 hardware.PWMPin
+}
+
+func checkErrors(e ...error) error {
+	for _, i := range e {
+		if i != nil {
+			return i
+		}
+	}
+	return nil
+}
+
+func (a *A4950) Forward(d time.Duration) error {
+	return a.withMutex(func() error {
+		err1 := a.i1.DigitalWrite(hardware.GPIO_HIGH)
+		err2 := a.i2.DigitalWrite(hardware.GPIO_LOW)
+		if err := checkErrors(err1, err2); err != nil {
+			a.Brake()
+			return err
+		}
+		if d == 0 {
+			return nil
+		}
+		ch := time.After(d)
+		select {
+		case <-ch:
+			return a.Brake()
+		}
+	})
+}
+
+func (a *A4950) Backward(d time.Duration) error {
+	return a.withMutex(func() error {
+		err1 := a.i1.DigitalWrite(hardware.GPIO_LOW)
+		err2 := a.i2.DigitalWrite(hardware.GPIO_HIGH)
+		if err := checkErrors(err1, err2); err != nil {
+			a.Brake()
+			return err
+		}
+
+		if d == 0 {
+			return nil
+		}
+		ch := time.After(d)
+		select {
+		case <-ch:
+			return a.Brake()
+		}
+	})
+}
+
+func (a *A4950) ChopForward(v hardware.PinValue, d time.Duration) error {
+	return a.withMutex(func() error {
+		err1 := a.i1.DigitalWrite(hardware.GPIO_HIGH)
+		err2 := a.i2.AnalogWrite(v)
+		if err := checkErrors(err1, err2); err != nil {
+			a.Brake()
+			return err
+		}
+		if d == 0 {
+			return nil
+		}
+		ch := time.After(d)
+		select {
+		case <-ch:
+			return a.Brake()
+		}
+	})
+}
+
+func (a *A4950) ChopReverse(v hardware.PinValue, d time.Duration) error {
+	return a.withMutex(func() error {
+		err1 := a.i2.DigitalWrite(hardware.GPIO_HIGH)
+		err2 := a.i1.AnalogWrite(v)
+		if err := checkErrors(err1, err2); err != nil {
+			a.Brake()
+			return err
+		}
+
+		if d == 0 {
+			return nil
+		}
+		ch := time.After(d)
+		select {
+		case <-ch:
+			return a.Brake()
+		}
+	})
+}
+
+func (a *A4950) Brake() error {
+	return a.withMutex(func() error {
+		err1 := a.i1.DigitalWrite(hardware.GPIO_HIGH)
+		err2 := a.i2.DigitalWrite(hardware.GPIO_HIGH)
+		return checkErrors(err1, err2)
+	})
+}
+
+func (a *A4950) Coast() error {
+	return a.withMutex(func() error {
+		err1 := a.i1.DigitalWrite(hardware.GPIO_LOW)
+		err2 := a.i2.DigitalWrite(hardware.GPIO_LOW)
+		return checkErrors(err1, err2)
+	})
+}
+
+func (a *A4950) withMutex(job func() error) error {
+	a.m.Lock()
+	defer a.m.Unlock()
+	err := job()
+	return err
+}
