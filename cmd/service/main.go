@@ -54,7 +54,7 @@ func main() {
 
 	logger.Println("loading carService")
 	//carService, err := LoadCarService(*configFile)
-	carService := car.Service(NewServiceHandler(NewFakeCar(logger)))
+	carService := car.Service(car.NewGeneralServiceHandler(NewFakeCar(logger)))
 	if err != nil {
 		logger.Fatalln("error occur while loading carService :", err)
 	}
