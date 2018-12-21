@@ -32,6 +32,9 @@ func (e *GeneralGPIOHub) doCommand(m CommandMethod, p PinNumber, v PinValue) (Pi
 		}
 		return req.GetRes(), nil
 	})
+	if err != nil {
+		return 0, err
+	}
 	return res.(PinValue), err
 }
 func (e *GeneralGPIOHub) PinMode(pin PinNumber, mode PinValue) error {

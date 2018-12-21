@@ -55,7 +55,7 @@ func (g *GeneralGPIORequester) Commit(c Controller) error {
 			return CommandResponse{}, errors.New("unsupported method")
 		}
 	}()
-	if err == nil {
+	if err != nil {
 		return err
 	}
 	err = res.Check(Command_GPIO)
@@ -63,12 +63,12 @@ func (g *GeneralGPIORequester) Commit(c Controller) error {
 		return err
 	}
 	switch g.m {
-	case GPIO_PinMode:
-		g.res = res.GetParameter()[2].(PinValue)
-	case GPIO_DigitalWrite:
-		g.res = res.GetParameter()[2].(PinValue)
-	case GPIO_AnalogWrite:
-		g.res = res.GetParameter()[2].(PinValue)
+	case GPIO_DigitalRead:
+		g.res = res.GetParameter()[0].(PinValue)
+		break
+	case GPIO_AnalogRead:
+		g.res = res.GetParameter()[0].(PinValue)
+		break
 	}
 	return nil
 }
