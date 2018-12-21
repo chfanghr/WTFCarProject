@@ -45,7 +45,7 @@ func main() {
 			log.Fatalln(err)
 		}
 		for _, v := range strs {
-			_, err := f.WriteString(v)
+			_, err := f.WriteString(v + "\n")
 			if err != nil {
 				log.Fatalln(err)
 			}
