@@ -10,7 +10,7 @@ const (
 )
 const (
 	Command_GPIO CommandType = iota
-	Command_IRRemote
+	Command_IR
 	Command_Data
 )
 
