@@ -92,9 +92,11 @@ func SetupLogger(logFilePath string, useStdio bool) (logger *log.Logger, err err
 	logger.Println(ServiceName, "starting")
 	return logger, nil
 }
+
 func SetupListener(listenNetwork, listenAddress string) (net.Listener, error) {
 	return net.Listen(listenNetwork, listenAddress)
 }
+
 func LoadCarService(configFile string) (car.Service, error) {
 	if len(configFile) > 0 {
 		Logger.Println("load from config file")
@@ -116,10 +118,11 @@ func LoadCarService(configFile string) (car.Service, error) {
 	} else {
 		//return LoadDefaultCarService()
 		Logger.Println("load fake car")
-		return LoadFakeCarSevice()
+		return LoadFakeCarService()
 	}
 	return nil, errors.New("unknown error")
 }
+
 func LoadDefaultCarService() (car.Service, error) {
 	c, err := NewCar(DefaultI2CAddr, DefaultI2CBus, DefaultMotorAIN1, DefaultMotorAIN2, DefaultMotorBIN1, DefaultMotorBIN2, DefaultIRPin, DefaultBluetoothHost, DefaultIBeaconName, DefaultIbeaconUUID)
 	if err != nil {
@@ -127,6 +130,7 @@ func LoadDefaultCarService() (car.Service, error) {
 	}
 	return car.NewGeneralServiceHandler(c), nil
 }
-func LoadFakeCarSevice() (car.Service, error) {
+
+func LoadFakeCarService() (car.Service, error) {
 	return car.NewGeneralServiceHandler(NewFakeCar(Logger)), nil
 }
