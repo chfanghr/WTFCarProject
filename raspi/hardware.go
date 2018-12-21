@@ -32,9 +32,9 @@ func (c RaspiController) Command(req hardware.CommandRequest) (hardware.CommandR
 			}
 
 			if err != nil {
-				return *hardware.NewCommandResponse(hardware.Command_GPIO, hardware.OperationFailed), err
+				return *hardware.NewCommandResponse(hardware.Command_GPIO, hardware.Operation_Failed), err
 			}
-			return *hardware.NewCommandResponse(hardware.Command_GPIO, hardware.OperationSucceeded), nil
+			return *hardware.NewCommandResponse(hardware.Command_GPIO, hardware.Operation_Succeeded), nil
 		case hardware.GPIO_DigitalWrite:
 			switch req.CommParameter[3].(hardware.PinValue) {
 			case hardware.GPIO_HIGH:
@@ -46,17 +46,17 @@ func (c RaspiController) Command(req hardware.CommandRequest) (hardware.CommandR
 			}
 			if err != nil {
 				if err != nil {
-					return *hardware.NewCommandResponse(hardware.Command_GPIO, hardware.OperationFailed), err
+					return *hardware.NewCommandResponse(hardware.Command_GPIO, hardware.Operation_Failed), err
 				}
-				return *hardware.NewCommandResponse(hardware.Command_GPIO, hardware.OperationSucceeded), nil
+				return *hardware.NewCommandResponse(hardware.Command_GPIO, hardware.Operation_Succeeded), nil
 			}
 		case hardware.GPIO_DigitalRead:
 			v, err := dp.DigitalRead()
 			if err != nil {
 				if err != nil {
-					return *hardware.NewCommandResponse(hardware.Command_GPIO, hardware.OperationFailed, 0), err
+					return *hardware.NewCommandResponse(hardware.Command_GPIO, hardware.Operation_Failed, 0), err
 				}
-				return *hardware.NewCommandResponse(hardware.Command_GPIO, hardware.OperationSucceeded, v), nil
+				return *hardware.NewCommandResponse(hardware.Command_GPIO, hardware.Operation_Succeeded, v), nil
 			}
 		default:
 			return hardware.CommandResponse{}, errors.New("unsupported method")
