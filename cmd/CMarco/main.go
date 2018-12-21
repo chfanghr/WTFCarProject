@@ -11,6 +11,7 @@ func CMarcoConstantValue(name string, value interface{}) string {
 
 func main() {
 	var strs = []string{}
+	strs = append(strs, "//This code is generated automatically,do not edit")
 	strs = append(strs, "//------------------------------------")
 	strs = append(strs, CMarcoConstantValue("Operation_Succeeded", hardware.Operation_Succeeded))
 	strs = append(strs, CMarcoConstantValue("Operation_Failed", hardware.Operation_Failed))
