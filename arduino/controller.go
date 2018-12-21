@@ -2,7 +2,7 @@ package arduino
 
 import (
 	"encoding/json"
-	"github.com/chfanghr/backend/hardware"
+	"github.com/chfanghr/Backend/hardware"
 	"sync"
 	"time"
 )

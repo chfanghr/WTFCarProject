@@ -2,7 +2,7 @@ package raspi
 
 import (
 	"errors"
-	"github.com/chfanghr/backend/hardware"
+	"github.com/chfanghr/Backend/hardware"
 )
 
 type RaspiController struct{}

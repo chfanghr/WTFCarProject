@@ -1,6 +1,6 @@
 package generalir
 
-import . "github.com/chfanghr/backend/hardware"
+import . "github.com/chfanghr/Backend/hardware"
 
 type IRRequester struct {
 	data   IRData

@@ -1,7 +1,7 @@
 package generalir
 
 import (
-	"github.com/chfanghr/backend/hardware"
+	"github.com/chfanghr/Backend/hardware"
 	"sync"
 )
 

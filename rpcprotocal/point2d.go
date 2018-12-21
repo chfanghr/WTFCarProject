@@ -1,6 +1,6 @@
 package rpcprotocal
 
-import "github.com/chfanghr/backend/location"
+import "github.com/chfanghr/Backend/location"
 
 type Point2D struct {
 	X float64 `json:"x"`

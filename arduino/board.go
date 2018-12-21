@@ -1,6 +1,6 @@
 package arduino
 
-import "github.com/chfanghr/backend/hardware"
+import "github.com/chfanghr/Backend/hardware"
 
 type Board interface {
 	IsValidPin(hardware.PinNumber) error
