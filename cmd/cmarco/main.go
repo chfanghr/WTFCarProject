@@ -13,7 +13,7 @@ func CMarcoConstantValue(name string, value interface{}) string {
 }
 
 func main() {
-	file := flag.String("output", "", "output .c file")
+	file := flag.String("output", "", "output .h file")
 	var strs = []string{}
 	strs = append(strs, "//This code is generated automatically by github.com/chfanghr/Backend/cmd/cmarco,do not edit")
 	strs = append(strs, "//------------------------------------")
@@ -24,7 +24,6 @@ func main() {
 	strs = append(strs, CMarcoConstantValue("Command_IR", hardware.Command_IR))
 	strs = append(strs, CMarcoConstantValue("Command_Data", hardware.Command_Data))
 	strs = append(strs, "//------------------------------------")
-	strs = append(strs, CMarcoConstantValue("GPIO_HIGH", hardware.GPIO_HIGH))
 	strs = append(strs, CMarcoConstantValue("GPIO_HIGH", hardware.GPIO_HIGH))
 	strs = append(strs, CMarcoConstantValue("GPIO_LOW", hardware.GPIO_LOW))
 	strs = append(strs, CMarcoConstantValue("GPIO_INPUT", hardware.GPIO_INPUT))
