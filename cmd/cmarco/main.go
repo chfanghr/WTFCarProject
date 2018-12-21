@@ -14,6 +14,7 @@ func CMarcoConstantValue(name string, value interface{}) string {
 
 func main() {
 	file := flag.String("output", "", "output .h file")
+	flag.Parse()
 	var strs = []string{}
 	strs = append(strs, "//This code is generated automatically by github.com/chfanghr/Backend/cmd/cmarco,do not edit")
 	strs = append(strs, "//------------------------------------")
