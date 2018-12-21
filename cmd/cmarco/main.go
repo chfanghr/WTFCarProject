@@ -4,8 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"github.com/chfanghr/Backend/hardware"
-	"io/ioutil"
 	"log"
+	"os"
 )
 
 func CMarcoConstantValue(name string, value interface{}) string {
@@ -40,8 +40,12 @@ func main() {
 	strs = append(strs, "//------------------------------------")
 	strs = append(strs, CMarcoConstantValue("IR_SendData", hardware.IR_SendData))
 	if len(*file) > 0 {
+		f, err := os.OpenFile(*file, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
+		if err != nil {
+			log.Fatalln(err)
+		}
 		for _, v := range strs {
-			err := ioutil.WriteFile(*file, []byte(v), 0666)
+			_, err := f.WriteString(v)
 			if err != nil {
 				log.Fatalln(err)
 			}
