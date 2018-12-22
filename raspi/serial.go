@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-const DefaultSize = 8 // Default value for Config.Size
+const DefaultSize = 8 // Default value for SerialConfig.Size
 
 type StopBits byte
 type Parity byte
@@ -24,7 +24,7 @@ const (
 	ParitySpace Parity = 'S' // parity bit is always 0
 )
 
-// Config contains the information needed to open a serial port.
+// SerialConfig contains the information needed to open a serial port.
 //
 // Currently few options are implemented, but more may be added in the
 // future (patches welcome), so it is recommended that you create a
@@ -32,14 +32,14 @@ const (
 //
 // For example:
 //
-//    c0 := &serial.Config{Name: "COM45", Baud: 115200, ReadTimeout: time.Millisecond * 500}
+//    c0 := &serial.SerialConfig{Name: "COM45", Baud: 115200, ReadTimeout: time.Millisecond * 500}
 // or
-//    c1 := new(serial.Config)
+//    c1 := new(serial.SerialConfig)
 //    c1.Name = "/dev/tty.usbserial"
 //    c1.Baud = 115200
 //    c1.ReadTimeout = time.Millisecond * 500
 //
-type Config struct {
+type SerialConfig struct {
 	Name        string
 	Baud        int
 	ReadTimeout time.Duration // Total timeout
@@ -69,8 +69,8 @@ var ErrBadStopBits error = errors.New("unsupported stop bit setting")
 // ErrBadParity is returned if the parity is not supported.
 var ErrBadParity error = errors.New("unsupported parity setting")
 
-// OpenPort opens a serial port with the specified configuration
-func OpenPort(c *Config) (*Port, error) {
+// OpenSerialPort opens a serial port with the specified configuration
+func OpenSerialPort(c *SerialConfig) (*SerialPort, error) {
 	size, par, stop := c.Size, c.Parity, c.StopBits
 	if size == 0 {
 		size = DefaultSize
@@ -81,7 +81,7 @@ func OpenPort(c *Config) (*Port, error) {
 	if stop == 0 {
 		stop = Stop1
 	}
-	return openPort(c.Name, c.Baud, size, par, stop, c.ReadTimeout)
+	return openSerialPort(c.Name, c.Baud, size, par, stop, c.ReadTimeout)
 }
 
 // Converts the timeout values for Linux / POSIX systems

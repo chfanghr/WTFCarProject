@@ -63,7 +63,7 @@ func (s *GeneralServiceHandler) StopMoving(int, *int) error {
 	})
 }
 func (s *GeneralServiceHandler) IRSend(data hardware.IRData, nouse *int) error {
-	if len(data) > hardware.IR_DataMaxLen {
+	if len(data) > hardware.IrDatamaxlen {
 		return operationFailed
 	}
 	return s.withMutex(func() error {

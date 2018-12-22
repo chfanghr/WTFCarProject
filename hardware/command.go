@@ -5,13 +5,15 @@ import (
 )
 
 const (
-	Operation_Succeeded CommandStatus = iota
-	Operation_Failed
+	OperationSucceeded CommandStatus = iota
+	OperationFailed
 )
 const (
-	Command_GPIO CommandType = iota
-	Command_IR
-	Command_Data
+	CommandGpio CommandType = iota
+	CommandIr
+	CommandSerial
+	CommandSerialHost
+	CommandData
 )
 
 type CommandType int
@@ -52,9 +54,9 @@ func (res CommandResponse) Check(t CommandType) error {
 		return errors.New("type error")
 	}
 	switch res.CommStatus {
-	case Operation_Succeeded:
+	case OperationSucceeded:
 		return nil
-	case Operation_Failed:
+	case OperationFailed:
 		return errors.New("operation failed")
 	default:
 		return errors.New("unknown error")

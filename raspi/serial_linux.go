@@ -11,7 +11,7 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-func openPort(name string, baud int, databits byte, parity Parity, stopbits StopBits, readTimeout time.Duration) (p *Port, err error) {
+func openSerialPort(name string, baud int, databits byte, parity Parity, stopbits StopBits, readTimeout time.Duration) (p *SerialPort, err error) {
 	var bauds = map[int]uint32{
 		50:      unix.B50,
 		75:      unix.B75,
@@ -125,26 +125,26 @@ func openPort(name string, baud int, databits byte, parity Parity, stopbits Stop
 		return
 	}
 
-	return &Port{f: f}, nil
+	return &SerialPort{f: f}, nil
 }
 
-type Port struct {
+type SerialPort struct {
 	// We intentionly do not use an "embedded" struct so that we
 	// don't export File
 	f *os.File
 }
 
-func (p *Port) Read(b []byte) (n int, err error) {
+func (p *SerialPort) Read(b []byte) (n int, err error) {
 	return p.f.Read(b)
 }
 
-func (p *Port) Write(b []byte) (n int, err error) {
+func (p *SerialPort) Write(b []byte) (n int, err error) {
 	return p.f.Write(b)
 }
 
 // Discards data written to the port but not transmitted,
 // or data received but not read
-func (p *Port) Flush() error {
+func (p *SerialPort) Flush() error {
 	const TCFLSH = 0x540B
 	_, _, errno := unix.Syscall(
 		unix.SYS_IOCTL,
@@ -159,6 +159,6 @@ func (p *Port) Flush() error {
 	return errno
 }
 
-func (p *Port) Close() (err error) {
+func (p *SerialPort) Close() (err error) {
 	return p.f.Close()
 }
