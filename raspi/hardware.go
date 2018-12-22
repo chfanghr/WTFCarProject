@@ -2,7 +2,6 @@ package raspi
 
 import (
 	"errors"
-	"fmt"
 	"github.com/chfanghr/Backend/hardware"
 	"sync"
 )
@@ -43,7 +42,7 @@ func (c *RaspiController) Command(req hardware.CommandRequest) (hardware.Command
 			} else {
 				switch req.CommMethod {
 				case hardware.GpioPinmode:
-					if len(req.CommParameter)<2{
+					if len(req.CommParameter) < 2 {
 						return *hardware.NewCommandResponse(hardware.CommandGpio, hardware.OperationFailed), errors.New("len of parameters too short")
 					}
 					switch req.CommParameter[1].(hardware.PinValue) {
@@ -62,7 +61,7 @@ func (c *RaspiController) Command(req hardware.CommandRequest) (hardware.Command
 						return *hardware.NewCommandResponse(hardware.CommandGpio, hardware.OperationSucceeded), nil
 					}
 				case hardware.GpioDigitalWrite:
-					if len(req.CommParameter)<2{
+					if len(req.CommParameter) < 2 {
 						return *hardware.NewCommandResponse(hardware.CommandGpio, hardware.OperationFailed), errors.New("len of parameters too short")
 					}
 					switch req.CommParameter[1].(hardware.PinValue) {
@@ -81,7 +80,7 @@ func (c *RaspiController) Command(req hardware.CommandRequest) (hardware.Command
 						return *hardware.NewCommandResponse(hardware.CommandGpio, hardware.OperationSucceeded), nil
 					}
 				case hardware.GpioDigitalRead:
-					if len(req.CommParameter)<1{
+					if len(req.CommParameter) < 1 {
 						return *hardware.NewCommandResponse(hardware.CommandGpio, hardware.OperationFailed), errors.New("len of parameters too short")
 					}
 					v, err := dp.DigitalRead()
@@ -102,65 +101,67 @@ func (c *RaspiController) Command(req hardware.CommandRequest) (hardware.Command
 					return *hardware.NewCommandResponse(hardware.CommandGpio, hardware.OperationFailed), errors.New("unsupported method")
 				}
 			}
-		case hardware.CommandSerialHost:
-			switch req.CommMethod {
-			case hardware.SerialHostBegin:
-				if len(req.CommParameter)<2{
-					return *hardware.NewCommandResponse(hardware.CommandSerialHost, hardware.OperationFailed), errors.New("len of parameters too short")
-				}
-				if _, ok := c.p[req.CommParameter[0].(hardware.SerialBusIdentifier)]; ok {
-					return *hardware.NewCommandResponse(hardware.CommandSerial, hardware.OperationFailed), errors.New("port already begin")
-				}
-				cf := SerialConfig{
-					Name: fmt.Sprint("/dev/ttyUSB", req.CommParameter[0].(hardware.SerialBusIdentifier)),
-					Baud: int(req.CommParameter[1].(hardware.SerialBaudRate)),
-				}
-				p, err := OpenSerialPort(&cf)
-				if err != nil {
-					return *hardware.NewCommandResponse(hardware.CommandSerial, hardware.OperationFailed), err
-				}
-				c.p[req.CommParameter[0].(hardware.SerialBusIdentifier)] = p
-				return *hardware.NewCommandResponse(hardware.CommandSerial, hardware.OperationSucceeded), nil
-			case hardware.SerialHostEnd:
-				if len(req.CommParameter)<1{
-					return *hardware.NewCommandResponse(hardware.CommandSerialHost, hardware.OperationFailed), errors.New("len of parameters too short")
-				}
-				if p, ok := c.p[req.CommParameter[0].(hardware.SerialBusIdentifier)]; ok {
-					err := p.Close()
-					delete(c.p, req.CommParameter[0].(hardware.SerialBusIdentifier))
-					if err != nil {
-						return *hardware.NewCommandResponse(hardware.CommandSerial, hardware.OperationFailed), err
+			/*
+				case hardware.CommandSerialHost:
+					switch req.CommMethod {
+					case hardware.SerialHostBegin:
+						if len(req.CommParameter)<2{
+							return *hardware.NewCommandResponse(hardware.CommandSerialHost, hardware.OperationFailed), errors.New("len of parameters too short")
+						}
+						if _, ok := c.p[req.CommParameter[0].(hardware.SerialBusIdentifier)]; ok {
+							return *hardware.NewCommandResponse(hardware.CommandSerial, hardware.OperationFailed), errors.New("port already begin")
+						}
+						cf := SerialConfig{
+							Name: fmt.Sprint("/dev/ttyUSB", req.CommParameter[0].(hardware.SerialBusIdentifier)),
+							Baud: int(req.CommParameter[1].(hardware.SerialBaudRate)),
+						}
+						p, err := OpenSerialPort(&cf)
+						if err != nil {
+							return *hardware.NewCommandResponse(hardware.CommandSerial, hardware.OperationFailed), err
+						}
+						c.p[req.CommParameter[0].(hardware.SerialBusIdentifier)] = p
+						return *hardware.NewCommandResponse(hardware.CommandSerial, hardware.OperationSucceeded), nil
+					case hardware.SerialHostEnd:
+						if len(req.CommParameter)<1{
+							return *hardware.NewCommandResponse(hardware.CommandSerialHost, hardware.OperationFailed), errors.New("len of parameters too short")
+						}
+						if p, ok := c.p[req.CommParameter[0].(hardware.SerialBusIdentifier)]; ok {
+							err := p.Close()
+							delete(c.p, req.CommParameter[0].(hardware.SerialBusIdentifier))
+							if err != nil {
+								return *hardware.NewCommandResponse(hardware.CommandSerial, hardware.OperationFailed), err
+							}
+							return *hardware.NewCommandResponse(hardware.CommandSerial, hardware.OperationSucceeded), nil
+						} else {
+							return *hardware.NewCommandResponse(hardware.CommandSerial, hardware.OperationFailed), errors.New("port not exist")
+						}
+					case hardware.SerialHostSetTimeout:
+						if len(req.CommParameter)<2{
+							return *hardware.NewCommandResponse(hardware.CommandSerialHost, hardware.OperationFailed), errors.New("len of parameters too short")
+						}
+						if p, ok := c.p[req.CommParameter[0].(hardware.SerialBusIdentifier)]; ok {
+							err := p.Close()
+							delete(c.p, req.CommParameter[0].(hardware.SerialBusIdentifier))
+							if err != nil {
+								return *hardware.NewCommandResponse(hardware.CommandSerial, hardware.OperationFailed), err
+							}
+							cf := SerialConfig{
+								Name: fmt.Sprint("/dev/ttyUSB", req.CommParameter[0].(hardware.SerialBusIdentifier)),
+								Baud: int(req.CommParameter[1].(hardware.SerialBaudRate)),
+								ReadTimeout:req.CommParameter[0]
+							}
+							p, err := OpenSerialPort(&cf)
+							if err != nil {
+								return *hardware.NewCommandResponse(hardware.CommandSerial, hardware.OperationFailed), err
+							}
+							return *hardware.NewCommandResponse(hardware.CommandSerial, hardware.OperationSucceeded), nil
+						} else {
+							return *hardware.NewCommandResponse(hardware.CommandSerial, hardware.OperationFailed), errors.New("port not exist")
+						}
+					default:
+						return *hardware.NewCommandResponse(hardware.CommandSerial, hardware.OperationFailed), errors.New("unsupported method")
 					}
-					return *hardware.NewCommandResponse(hardware.CommandSerial, hardware.OperationSucceeded), nil
-				} else {
-					return *hardware.NewCommandResponse(hardware.CommandSerial, hardware.OperationFailed), errors.New("port not exist")
-				}
-			case hardware.SerialHostSetTimeout:
-				if len(req.CommParameter)<2{
-					return *hardware.NewCommandResponse(hardware.CommandSerialHost, hardware.OperationFailed), errors.New("len of parameters too short")
-				}
-				if p, ok := c.p[req.CommParameter[0].(hardware.SerialBusIdentifier)]; ok {
-					err := p.Close()
-					delete(c.p, req.CommParameter[0].(hardware.SerialBusIdentifier))
-					if err != nil {
-						return *hardware.NewCommandResponse(hardware.CommandSerial, hardware.OperationFailed), err
-					}
-					cf := SerialConfig{
-						Name: fmt.Sprint("/dev/ttyUSB", req.CommParameter[0].(hardware.SerialBusIdentifier)),
-						Baud: int(req.CommParameter[1].(hardware.SerialBaudRate)),
-						ReadTimeout:req.CommParameter[0]
-					}
-					p, err := OpenSerialPort(&cf)
-					if err != nil {
-						return *hardware.NewCommandResponse(hardware.CommandSerial, hardware.OperationFailed), err
-					}
-					return *hardware.NewCommandResponse(hardware.CommandSerial, hardware.OperationSucceeded), nil
-				} else {
-					return *hardware.NewCommandResponse(hardware.CommandSerial, hardware.OperationFailed), errors.New("port not exist")
-				}
-			default:
-				return *hardware.NewCommandResponse(hardware.CommandSerial, hardware.OperationFailed), errors.New("unsupported method")
-			}
+			*/
 		default:
 			return *hardware.NewCommandResponse(hardware.CommandGpio, hardware.OperationFailed), errors.New("unsupported type")
 		}
