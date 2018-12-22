@@ -69,8 +69,8 @@ var ErrBadStopBits error = errors.New("unsupported stop bit setting")
 // ErrBadParity is returned if the parity is not supported.
 var ErrBadParity error = errors.New("unsupported parity setting")
 
-// OpenSerialPort opens a serial port with the specified configuration
-func OpenSerialPort(c *SerialConfig) (*SerialPort, error) {
+// OpenPort opens a serial port with the specified configuration
+func OpenPort(c *SerialConfig) (*SerialPort, error) {
 	size, par, stop := c.Size, c.Parity, c.StopBits
 	if size == 0 {
 		size = DefaultSize

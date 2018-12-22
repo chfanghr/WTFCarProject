@@ -3,7 +3,7 @@ package hardware
 type IRData []uint8
 
 const (
-	IrSendData CommandMethod = iota
+	IrSenddata CommandMethod = iota
 )
 
 const IrDatamaxlen = 10

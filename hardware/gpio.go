@@ -29,14 +29,14 @@ const (
 )
 const (
 	GpioInput PinValue = iota
-	GpioInputPullUp
-	GpioInputPullDown
+	GpioInputPullup
+	GpioInputPulldown
 	GpioOutput
 )
 const (
 	GpioPinmode CommandMethod = iota
-	GpioDigitalWrite
-	GpioDigitalRead
-	GpioAnalogWrite
-	GpioAnalogRead
+	GpioDigitalwrite
+	GpioDigitalread
+	GpioAnalogwrite
+	GpioAnalogread
 )

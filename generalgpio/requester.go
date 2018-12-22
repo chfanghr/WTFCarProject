@@ -29,14 +29,14 @@ func (g *GeneralGPIORequester) Commit(c Controller) error {
 				return c.Command(*NewCommandRequest(CommandGpio, g.m, g.p, g.v))
 			case GpioOutput:
 				return c.Command(*NewCommandRequest(CommandGpio, g.m, g.p, g.v))
-			case GpioInputPullUp:
+			case GpioInputPullup:
 				return c.Command(*NewCommandRequest(CommandGpio, g.m, g.p, g.v))
-			case GpioInputPullDown:
+			case GpioInputPulldown:
 				return c.Command(*NewCommandRequest(CommandGpio, g.m, g.p, g.v))
 			default:
 				return CommandResponse{}, errors.New("invalid mode")
 			}
-		case GpioDigitalWrite:
+		case GpioDigitalwrite:
 			switch g.v {
 			case GpioHigh:
 				return c.Command(*NewCommandRequest(CommandGpio, g.m, g.p, g.v))
@@ -45,11 +45,11 @@ func (g *GeneralGPIORequester) Commit(c Controller) error {
 			default:
 				return CommandResponse{}, errors.New("invalid value")
 			}
-		case GpioAnalogWrite:
+		case GpioAnalogwrite:
 			return c.Command(*NewCommandRequest(CommandGpio, g.m, g.p, g.v))
-		case GpioAnalogRead:
+		case GpioAnalogread:
 			return c.Command(*NewCommandRequest(CommandGpio, g.m, g.p))
-		case GpioDigitalRead:
+		case GpioDigitalread:
 			return c.Command(*NewCommandRequest(CommandGpio, g.m, g.p))
 		default:
 			return CommandResponse{}, errors.New("unsupported method")
@@ -63,10 +63,10 @@ func (g *GeneralGPIORequester) Commit(c Controller) error {
 		return err
 	}
 	switch g.m {
-	case GpioDigitalRead:
+	case GpioDigitalread:
 		g.res = res.GetParameter()[0].(PinValue)
 		break
-	case GpioAnalogRead:
+	case GpioAnalogread:
 		g.res = res.GetParameter()[0].(PinValue)
 		break
 	}

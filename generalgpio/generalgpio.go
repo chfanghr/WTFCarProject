@@ -43,9 +43,9 @@ func (e *GeneralGPIOHub) PinMode(pin PinNumber, mode PinValue) error {
 		break
 	case GpioOutput:
 		break
-	case GpioInputPullUp:
+	case GpioInputPullup:
 		break
-	case GpioInputPullDown:
+	case GpioInputPulldown:
 		break
 	default:
 		return errors.New("invalid mode")
@@ -66,7 +66,7 @@ func (e *GeneralGPIOHub) DigitalWrite(pin PinNumber, value PinValue) error {
 	default:
 		return errors.New("invalid value")
 	}
-	_, err := e.doCommand(GpioDigitalWrite, pin, value)
+	_, err := e.doCommand(GpioDigitalwrite, pin, value)
 	return err
 }
 func (e *GeneralGPIOHub) DigitalRead(pin PinNumber) (PinValue, error) {
@@ -74,7 +74,7 @@ func (e *GeneralGPIOHub) DigitalRead(pin PinNumber) (PinValue, error) {
 	if err != nil {
 		return 0, err
 	}
-	v, err := e.doCommand(GpioDigitalRead, pin, 0)
+	v, err := e.doCommand(GpioDigitalread, pin, 0)
 	if err != nil {
 		return 0, err
 	}
@@ -93,7 +93,7 @@ func (e *GeneralGPIOHub) AnalogWrite(pin PinNumber, value PinValue) error {
 	if err != nil {
 		return err
 	}
-	_, err = e.doCommand(GpioAnalogWrite, pin, value)
+	_, err = e.doCommand(GpioAnalogwrite, pin, value)
 	return err
 }
 func (e *GeneralGPIOHub) AnalogRead(pin PinNumber) (PinValue, error) {
@@ -101,7 +101,7 @@ func (e *GeneralGPIOHub) AnalogRead(pin PinNumber) (PinValue, error) {
 	if err != nil {
 		return 0, err
 	}
-	return e.doCommand(GpioAnalogRead, pin, 0)
+	return e.doCommand(GpioAnalogread, pin, 0)
 }
 
 type GeneralGPIO struct {
