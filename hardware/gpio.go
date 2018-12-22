@@ -24,19 +24,19 @@ type GPIOHub interface {
 }
 
 const (
-	GPIO_HIGH PinValue = iota
-	GPIO_LOW
+	GpioHigh PinValue = iota
+	GpioLow
 )
 const (
-	GPIO_INPUT PinValue = iota
-	GPIO_INPUT_PULLUP
-	GPIO_INPUT_PULLDOWN
-	GPIO_OUTPUT
+	GpioInput PinValue = iota
+	GpioInputPullUp
+	GpioInputPullDown
+	GpioOutput
 )
 const (
-	GPIO_PinMode CommandMethod = iota
-	GPIO_DigitalWrite
-	GPIO_DigitalRead
-	GPIO_AnalogWrite
-	GPIO_AnalogRead
+	GpioPinmode CommandMethod = iota
+	GpioDigitalWrite
+	GpioDigitalRead
+	GpioAnalogWrite
+	GpioAnalogRead
 )

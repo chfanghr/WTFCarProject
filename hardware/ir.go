@@ -3,10 +3,10 @@ package hardware
 type IRData []uint8
 
 const (
-	IR_SendData CommandMethod = iota
+	IrSendData CommandMethod = iota
 )
 
-const IR_DataMaxLen = 10
+const IrDatamaxlen = 10
 
 type IR interface {
 	Send(IRData) error

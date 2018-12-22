@@ -19,6 +19,6 @@ func NewGeneralIR(c hardware.Controller, p hardware.PinNumber) *GeneralIR {
 	}
 }
 func (g *GeneralIR) Send(d hardware.IRData) error {
-	req := NewIRRequester(g.p, hardware.IR_SendData, d)
+	req := NewIRRequester(g.p, hardware.IrSendData, d)
 	return req.Commit(g.c)
 }

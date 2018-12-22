@@ -39,13 +39,13 @@ func (e *GeneralGPIOHub) doCommand(m CommandMethod, p PinNumber, v PinValue) (Pi
 }
 func (e *GeneralGPIOHub) PinMode(pin PinNumber, mode PinValue) error {
 	switch mode {
-	case GPIO_INPUT:
+	case GpioInput:
 		break
-	case GPIO_OUTPUT:
+	case GpioOutput:
 		break
-	case GPIO_INPUT_PULLUP:
+	case GpioInputPullUp:
 		break
-	case GPIO_INPUT_PULLDOWN:
+	case GpioInputPullDown:
 		break
 	default:
 		return errors.New("invalid mode")
@@ -54,19 +54,19 @@ func (e *GeneralGPIOHub) PinMode(pin PinNumber, mode PinValue) error {
 	if err != nil {
 		return err
 	}
-	_, err = e.doCommand(GPIO_PinMode, pin, mode)
+	_, err = e.doCommand(GpioPinmode, pin, mode)
 	return err
 }
 func (e *GeneralGPIOHub) DigitalWrite(pin PinNumber, value PinValue) error {
 	switch value {
-	case GPIO_HIGH:
+	case GpioHigh:
 		break
-	case GPIO_LOW:
+	case GpioLow:
 		break
 	default:
 		return errors.New("invalid value")
 	}
-	_, err := e.doCommand(GPIO_DigitalWrite, pin, value)
+	_, err := e.doCommand(GpioDigitalWrite, pin, value)
 	return err
 }
 func (e *GeneralGPIOHub) DigitalRead(pin PinNumber) (PinValue, error) {
@@ -74,14 +74,14 @@ func (e *GeneralGPIOHub) DigitalRead(pin PinNumber) (PinValue, error) {
 	if err != nil {
 		return 0, err
 	}
-	v, err := e.doCommand(GPIO_DigitalRead, pin, 0)
+	v, err := e.doCommand(GpioDigitalRead, pin, 0)
 	if err != nil {
 		return 0, err
 	}
 	switch v {
-	case GPIO_LOW:
+	case GpioLow:
 		return v, nil
-	case GPIO_HIGH:
+	case GpioHigh:
 		return v, nil
 	default:
 		return 0, errors.New("unknown value")
@@ -93,7 +93,7 @@ func (e *GeneralGPIOHub) AnalogWrite(pin PinNumber, value PinValue) error {
 	if err != nil {
 		return err
 	}
-	_, err = e.doCommand(GPIO_AnalogWrite, pin, value)
+	_, err = e.doCommand(GpioAnalogWrite, pin, value)
 	return err
 }
 func (e *GeneralGPIOHub) AnalogRead(pin PinNumber) (PinValue, error) {
@@ -101,7 +101,7 @@ func (e *GeneralGPIOHub) AnalogRead(pin PinNumber) (PinValue, error) {
 	if err != nil {
 		return 0, err
 	}
-	return e.doCommand(GPIO_AnalogRead, pin, 0)
+	return e.doCommand(GpioAnalogRead, pin, 0)
 }
 
 type GeneralGPIO struct {
