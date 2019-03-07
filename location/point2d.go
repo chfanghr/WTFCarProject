@@ -2,8 +2,16 @@ package location
 
 import "math"
 
+const (
+	Yaxis int8 = iota
+	antiYaxis
+	Xaxis
+	antiXaxis
+)
+
 type Point2D struct {
-	x, y float64
+	x, y   float64
+	Facing int8
 }
 
 func NewPoint2D(x float64, y float64) *Point2D {

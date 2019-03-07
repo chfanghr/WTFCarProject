@@ -10,15 +10,17 @@ import (
 	"github.com/chfanghr/Backend/location"
 	"github.com/chfanghr/Backend/raspi"
 	"sync"
+	"time"
 )
 
 type Car struct {
-	a      hardware.Controller
-	le     location.Engine
-	hub    hardware.GPIOHub
-	MA, MB hardware.Motor
-	ir     hardware.IR
-	m      sync.Locker
+	a            hardware.Controller
+	le           location.Engine
+	hub          hardware.GPIOHub
+	MA, MB       hardware.Motor
+	ir           hardware.IR
+	m            sync.Locker
+	lastLocation location.Point2D
 }
 
 func NewCar(I2CAddr uint8, I2CBus int, MotorAIN1 hardware.PinNumber, MotorAIN2 hardware.PinNumber,
@@ -50,12 +52,27 @@ func (c *Car) withMutex(job func() (interface{}, error)) (interface{}, error) {
 }
 func (c *Car) GetLocation() (location.Point2D, error) {
 	res, err := c.withMutex(func() (i interface{}, e error) {
-		return c.le.GetLocation()
+		return c.lastLocation, nil //c.le.GetLocation()
 	})
 	return res.(location.Point2D), err
 }
-func (c *Car) MoveTo(location.Point2D) error {
+func (c *Car) MoveTo(l location.Point2D) error {
 	_, err := c.withMutex(func() (i interface{}, e error) {
+		// TODO:calculate path (last location,new location)
+		x := l.GetX() - c.lastLocation.GetX()
+		y := l.GetY() - c.lastLocation.GetY()
+
+		c.lastLocation = l
+
+		var goStraight = func(distance float64) {
+			const oneMeterA = time.Duration(time.Millisecond * 1000)
+			const oneMeterB = time.Duration(time.Millisecond * 1000)
+			err := c.MA.Forward(time.Duration(distance) * oneMeterA)
+			if err != nil {
+				return
+			}
+			c.MB.Forward(time.Duration(distance) * oneMeterB)
+		}
 		return nil, nil
 	})
 	return err
