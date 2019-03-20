@@ -25,13 +25,7 @@ func (g *GeneralGPIORequester) Commit(c Controller) error {
 		switch g.m {
 		case GpioPinmode:
 			switch g.v {
-			case GpioInput:
-				return c.Command(*NewCommandRequest(CommandGpio, g.m, g.p, g.v))
-			case GpioOutput:
-				return c.Command(*NewCommandRequest(CommandGpio, g.m, g.p, g.v))
-			case GpioInputPullup:
-				return c.Command(*NewCommandRequest(CommandGpio, g.m, g.p, g.v))
-			case GpioInputPulldown:
+			case GpioInput, GpioOutput, GpioInputPullup, GpioInputPulldown:
 				return c.Command(*NewCommandRequest(CommandGpio, g.m, g.p, g.v))
 			default:
 				return CommandResponse{}, errors.New("invalid mode")
@@ -62,11 +56,12 @@ func (g *GeneralGPIORequester) Commit(c Controller) error {
 	if err != nil {
 		return err
 	}
+
 	switch g.m {
-	case GpioDigitalread:
-		g.res = res.GetParameter()[0].(PinValue)
-		break
-	case GpioAnalogread:
+	case GpioDigitalread, GpioAnalogread:
+		if len(res.GetParameter()) == 0 {
+			return errors.New("invalid len of paramerters")
+		}
 		g.res = res.GetParameter()[0].(PinValue)
 		break
 	}

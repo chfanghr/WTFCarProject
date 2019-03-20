@@ -39,13 +39,7 @@ func (e *GeneralGPIOHub) doCommand(m CommandMethod, p PinNumber, v PinValue) (Pi
 }
 func (e *GeneralGPIOHub) PinMode(pin PinNumber, mode PinValue) error {
 	switch mode {
-	case GpioInput:
-		break
-	case GpioOutput:
-		break
-	case GpioInputPullup:
-		break
-	case GpioInputPulldown:
+	case GpioInput, GpioOutput, GpioInputPullup, GpioInputPulldown:
 		break
 	default:
 		return errors.New("invalid mode")
@@ -59,9 +53,7 @@ func (e *GeneralGPIOHub) PinMode(pin PinNumber, mode PinValue) error {
 }
 func (e *GeneralGPIOHub) DigitalWrite(pin PinNumber, value PinValue) error {
 	switch value {
-	case GpioHigh:
-		break
-	case GpioLow:
+	case GpioHigh, GpioLow:
 		break
 	default:
 		return errors.New("invalid value")
@@ -79,14 +71,11 @@ func (e *GeneralGPIOHub) DigitalRead(pin PinNumber) (PinValue, error) {
 		return 0, err
 	}
 	switch v {
-	case GpioLow:
-		return v, nil
-	case GpioHigh:
+	case GpioLow, GpioHigh:
 		return v, nil
 	default:
 		return 0, errors.New("unknown value")
 	}
-	return 0, errors.New("unknown error")
 }
 func (e *GeneralGPIOHub) AnalogWrite(pin PinNumber, value PinValue) error {
 	err := e.c.IsValidPin(pin)

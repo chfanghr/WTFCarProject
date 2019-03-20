@@ -24,8 +24,8 @@ type GPIOHub interface {
 }
 
 const (
-	GpioHigh PinValue = iota
-	GpioLow
+	GpioLow PinValue = iota
+	GpioHigh
 )
 const (
 	GpioInput PinValue = iota
