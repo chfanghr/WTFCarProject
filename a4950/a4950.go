@@ -41,11 +41,8 @@ func (a *A4950) Forward(d time.Duration) error {
 		if d == 0 {
 			return nil
 		}
-		ch := time.After(d)
-		select {
-		case <-ch:
-			return a.Brake()
-		}
+		a.brakeAfter(d)
+		return nil
 	})
 }
 
@@ -61,14 +58,20 @@ func (a *A4950) Backward(d time.Duration) error {
 		if d == 0 {
 			return nil
 		}
-		ch := time.After(d)
-		select {
-		case <-ch:
-			return a.Brake()
-		}
+		a.brakeAfter(d)
+		return nil
 	})
 }
 
+func (a *A4950) brakeAfter(duration time.Duration) {
+	go func() {
+		ch := time.After(duration)
+		select {
+		case <-ch:
+			_ = a.Brake()
+		}
+	}()
+}
 func (a *A4950) ChopForward(v hardware.PinValue, d time.Duration) error {
 	return a.withMutex(func() error {
 		err1 := a.i1.DigitalWrite(hardware.GpioHigh)
@@ -80,11 +83,9 @@ func (a *A4950) ChopForward(v hardware.PinValue, d time.Duration) error {
 		if d == 0 {
 			return nil
 		}
-		ch := time.After(d)
-		select {
-		case <-ch:
-			return a.Brake()
-		}
+
+		a.brakeAfter(d)
+		return nil
 	})
 }
 
@@ -100,11 +101,8 @@ func (a *A4950) ChopReverse(v hardware.PinValue, d time.Duration) error {
 		if d == 0 {
 			return nil
 		}
-		ch := time.After(d)
-		select {
-		case <-ch:
-			return a.Brake()
-		}
+		a.brakeAfter(d)
+		return nil
 	})
 }
 
