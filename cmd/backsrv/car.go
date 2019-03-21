@@ -10,15 +10,33 @@ import (
 	"github.com/chfanghr/Backend/location"
 	"github.com/chfanghr/Backend/raspi"
 	"sync"
+	"time"
 )
 
+type orientation uint8
+
+const (
+	YAxis orientation = iota
+	AntiYAxis
+	XAxis
+	AntiXAxis
+)
+
+//TODO:do something to get the true value of these parameters
+const PWMValue = 100
+const oneMeterA = time.Duration(time.Millisecond * 1000)
+const oneMeterB = time.Duration(time.Millisecond * 1000)
+const TurnTime = time.Duration(time.Millisecond * 1000)
+
 type Car struct {
-	a      hardware.Controller
-	le     location.Engine
-	hub    hardware.GPIOHub
-	MA, MB hardware.Motor
-	ir     hardware.IR
-	m      sync.Locker
+	a            hardware.Controller
+	le           location.Engine
+	hub          hardware.GPIOHub
+	MA, MB       hardware.Motor
+	ir           hardware.IR
+	m            sync.Locker
+	lastLocation location.Point2D
+	ori          orientation
 }
 
 func NewCar(I2CAddr uint8, I2CBus int, MotorAIN1 hardware.PinNumber, MotorAIN2 hardware.PinNumber,
@@ -40,6 +58,8 @@ func NewCar(I2CAddr uint8, I2CBus int, MotorAIN1 hardware.PinNumber, MotorAIN2 h
 	c.MB = a4950.NewA4950(MB1, MB2)
 	c.ir = generalir.NewGeneralIR(c.a, IRPin)
 	c.le = location.NewFakeLocationEngine()
+
+	c.ori = XAxis
 	return c, nil
 }
 func (c *Car) withMutex(job func() (interface{}, error)) (interface{}, error) {
@@ -50,12 +70,246 @@ func (c *Car) withMutex(job func() (interface{}, error)) (interface{}, error) {
 }
 func (c *Car) GetLocation() (location.Point2D, error) {
 	res, err := c.withMutex(func() (i interface{}, e error) {
-		return c.le.GetLocation()
+		return c.lastLocation, nil //c.le.GetLocation()
 	})
 	return res.(location.Point2D), err
 }
-func (c *Car) MoveTo(location.Point2D) error {
+func (c *Car) MoveTo(l location.Point2D) error {
 	_, err := c.withMutex(func() (i interface{}, e error) {
+
+		var goStraight = func(distance float64) error {
+
+			if distance >= 0 {
+				err := c.MA.ChopForward(PWMValue, time.Duration(distance)*oneMeterA)
+				if err != nil {
+					return err
+				}
+				err = c.MB.ChopForward(PWMValue, time.Duration(distance)*oneMeterB)
+				if err != nil {
+					return err
+				}
+			}
+			if distance < 0 {
+				distance = 0 - distance
+				err := c.MA.ChopReverse(PWMValue, time.Duration(distance)*oneMeterA)
+				if err != nil {
+					return err
+				}
+				err = c.MB.ChopReverse(PWMValue, time.Duration(distance)*oneMeterA)
+				if err != nil {
+					return err
+				}
+			}
+
+			return nil
+		}
+
+		var turn = func(orientation orientation) error {
+			switch c.ori {
+			case XAxis:
+				switch orientation {
+				case XAxis:
+					//do nothing
+				case AntiXAxis:
+					err := c.MA.ChopForward(PWMValue, TurnTime*2)
+					if err != nil {
+						return err
+					}
+					err = c.MB.ChopReverse(PWMValue, TurnTime*2)
+					if err != nil {
+						return err
+					}
+
+				case YAxis:
+					err := c.MB.ChopForward(PWMValue, TurnTime)
+					if err != nil {
+						return err
+					}
+					err = c.MA.ChopReverse(PWMValue, TurnTime)
+					if err != nil {
+						return err
+					}
+				case AntiYAxis:
+					err := c.MA.ChopForward(PWMValue, TurnTime)
+					if err != nil {
+						return err
+					}
+					err = c.MB.ChopReverse(PWMValue, TurnTime)
+					if err != nil {
+						return err
+					}
+				}
+			case AntiXAxis:
+				switch orientation {
+				case XAxis:
+					err := c.MA.ChopForward(PWMValue, TurnTime*2)
+					if err != nil {
+						return err
+					}
+					err = c.MB.ChopReverse(PWMValue, TurnTime*2)
+					if err != nil {
+						return err
+					}
+				case AntiXAxis:
+					//Do nothing
+				case YAxis:
+					err := c.MA.ChopForward(PWMValue, TurnTime)
+					if err != nil {
+						return err
+					}
+					err = c.MB.ChopReverse(PWMValue, TurnTime)
+					if err != nil {
+						return err
+					}
+				case AntiYAxis:
+					err := c.MB.ChopForward(PWMValue, TurnTime)
+					if err != nil {
+						return err
+					}
+					err = c.MA.ChopReverse(PWMValue, TurnTime)
+					if err != nil {
+						return err
+					}
+				}
+			case YAxis:
+				switch orientation {
+				case XAxis:
+					err := c.MA.ChopForward(PWMValue, TurnTime)
+					if err != nil {
+						return err
+					}
+					err = c.MB.ChopReverse(PWMValue, TurnTime)
+					if err != nil {
+						return err
+					}
+				case AntiXAxis:
+					err := c.MB.ChopForward(PWMValue, TurnTime)
+					if err != nil {
+						return err
+					}
+					err = c.MA.ChopReverse(PWMValue, TurnTime)
+					if err != nil {
+						return err
+					}
+				case YAxis:
+					//Do nothing
+				case AntiYAxis:
+					err := c.MA.ChopForward(PWMValue, TurnTime*2)
+					if err != nil {
+						return err
+					}
+					err = c.MB.ChopReverse(PWMValue, TurnTime*2)
+					if err != nil {
+						return err
+					}
+				}
+			case AntiYAxis:
+				switch orientation {
+				case XAxis:
+					err := c.MB.ChopForward(PWMValue, TurnTime)
+					if err != nil {
+						return err
+					}
+					err = c.MA.ChopReverse(PWMValue, TurnTime)
+					if err != nil {
+						return err
+					}
+				case AntiXAxis:
+					//Do nothing
+				case YAxis:
+					err := c.MA.ChopForward(PWMValue, TurnTime*2)
+					if err != nil {
+						return err
+					}
+					err = c.MB.ChopReverse(PWMValue, TurnTime*2)
+					if err != nil {
+						return err
+					}
+				case AntiYAxis:
+					err := c.MA.ChopForward(PWMValue, TurnTime)
+					if err != nil {
+						return err
+					}
+					err = c.MB.ChopReverse(PWMValue, TurnTime)
+					if err != nil {
+						return err
+					}
+				}
+
+			}
+			return nil
+		}
+		if err := func() error {
+			x := l.GetX() - c.lastLocation.GetX()
+			y := l.GetY() - c.lastLocation.GetY()
+
+			switch c.ori {
+			case XAxis:
+				err := goStraight(x)
+				if err != nil {
+					return err
+				}
+				err = turn(YAxis)
+				if err != nil {
+					return err
+				}
+				err = goStraight(y)
+				if err != nil {
+					return err
+				}
+				c.ori = YAxis
+			case AntiXAxis:
+				err := goStraight(-x)
+				if err != nil {
+					return err
+				}
+				err = turn(YAxis)
+				if err != nil {
+					return err
+				}
+				err = goStraight(y)
+				if err != nil {
+					return err
+				}
+				c.ori = YAxis
+			case YAxis:
+				err := goStraight(y)
+				if err != nil {
+					return err
+				}
+				err = turn(XAxis)
+				if err != nil {
+					return err
+				}
+				err = goStraight(x)
+				if err != nil {
+					return err
+				}
+				c.ori = XAxis
+
+			case AntiYAxis:
+				err := goStraight(-y)
+				if err != nil {
+					return err
+				}
+				err = turn(XAxis)
+				if err != nil {
+					return err
+				}
+				err = goStraight(x)
+				if err != nil {
+					return err
+				}
+				c.ori = XAxis
+			}
+
+			return nil
+		}(); err != nil {
+			return nil, err
+		}
+
+		c.lastLocation = l
+
 		return nil, nil
 	})
 	return err
