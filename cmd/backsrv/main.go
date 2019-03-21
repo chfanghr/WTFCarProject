@@ -8,6 +8,8 @@ import (
 	"log"
 	"net/rpc"
 	"net/rpc/jsonrpc"
+	"os"
+	"runtime/pprof"
 	"time"
 )
 
@@ -24,9 +26,18 @@ func main() {
 	listenNetwork := flag.String("listenNetwork", "tcp", "rpc server listen to which type of network")
 	listenAddress := flag.String("listenAddress", ":8888", "rpc server listen to which address")
 	networkTimeout := flag.Duration("networkTimeout", time.Second*5, "connection timeout")
+	cpuProfile := flag.String("cpuProfile", "", "path to cpu profile")
 	flag.StringVar(&ServiceName, "serviceName", ServiceName, "name of rpc service")
 	flag.Parse()
 
+	if *cpuProfile != "" {
+		profile, err := os.Create(*cpuProfile)
+		if err != nil {
+			log.Fatalln("error occur while creating profile :", err)
+		}
+		pprof.StartCPUProfile(profile)
+		defer pprof.StopCPUProfile()
+	}
 	var err error
 	Logger, err = SetupLogger(*logFilePath, !*closeStdio)
 	if err != nil {
