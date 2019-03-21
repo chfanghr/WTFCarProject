@@ -3,6 +3,7 @@ package car
 import (
 	"github.com/chfanghr/WTFCarProject/hardware"
 	"github.com/chfanghr/WTFCarProject/location"
+	"github.com/chfanghr/WTFCarProject/rpcprotocal"
 	"net/rpc/jsonrpc"
 )
 
@@ -20,6 +21,7 @@ func NewGeneralClient(networkType string, netWorkAddr string, serviceName string
 }
 
 func (g GeneralClient) GetLocation() (p location.Point2D, err error) {
+	tmp := rpcprotocal.Point2D{}
 	cl, err := jsonrpc.Dial(g.networkType, g.netWorkAddr)
 	defer func() {
 		if cl != nil {
@@ -29,7 +31,8 @@ func (g GeneralClient) GetLocation() (p location.Point2D, err error) {
 	if err != nil {
 		return location.Point2D{}, err
 	}
-	err = cl.Call(g.serviceName+".GetLocation", 0, &p)
+	err = cl.Call(g.serviceName+".GetLocation", 0, &tmp)
+	p = *rpcprotocal.Point2DToLocationPoint2D(tmp)
 	return
 }
 
