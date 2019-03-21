@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/chfanghr/Backend/arduino"
-	"github.com/chfanghr/Backend/generalserialhost"
-	"github.com/chfanghr/Backend/hardware"
-	"github.com/chfanghr/Backend/raspi"
+	"github.com/chfanghr/WTFCarProject/arduino"
+	"github.com/chfanghr/WTFCarProject/generalserialhost"
+	"github.com/chfanghr/WTFCarProject/hardware"
+	"github.com/chfanghr/WTFCarProject/raspi"
 	"log"
 	"os"
 )

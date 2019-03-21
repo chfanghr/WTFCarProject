@@ -1,8 +1,8 @@
 package car
 
 import (
-	"github.com/chfanghr/Backend/hardware"
-	"github.com/chfanghr/Backend/location"
+	"github.com/chfanghr/WTFCarProject/hardware"
+	"github.com/chfanghr/WTFCarProject/location"
 	"net/rpc/jsonrpc"
 )
 

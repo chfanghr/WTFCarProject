@@ -2,7 +2,7 @@ package generalserialhost
 
 import (
 	"errors"
-	"github.com/chfanghr/Backend/hardware"
+	"github.com/chfanghr/WTFCarProject/hardware"
 	"sync"
 )
 

@@ -1,9 +1,9 @@
 package car
 
 import (
-	"github.com/chfanghr/Backend/hardware"
-	"github.com/chfanghr/Backend/location"
-	"github.com/chfanghr/Backend/rpcprotocal"
+	"github.com/chfanghr/WTFCarProject/hardware"
+	"github.com/chfanghr/WTFCarProject/location"
+	"github.com/chfanghr/WTFCarProject/rpcprotocal"
 )
 
 const (

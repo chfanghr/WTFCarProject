@@ -1,14 +1,14 @@
 package main
 
 import (
-	"github.com/chfanghr/Backend/a4950"
-	"github.com/chfanghr/Backend/arduino"
-	"github.com/chfanghr/Backend/car"
-	"github.com/chfanghr/Backend/generalgpio"
-	"github.com/chfanghr/Backend/generalir"
-	"github.com/chfanghr/Backend/hardware"
-	"github.com/chfanghr/Backend/location"
-	"github.com/chfanghr/Backend/raspi"
+	"github.com/chfanghr/WTFCarProject/a4950"
+	"github.com/chfanghr/WTFCarProject/arduino"
+	"github.com/chfanghr/WTFCarProject/car"
+	"github.com/chfanghr/WTFCarProject/generalgpio"
+	"github.com/chfanghr/WTFCarProject/generalir"
+	"github.com/chfanghr/WTFCarProject/hardware"
+	"github.com/chfanghr/WTFCarProject/location"
+	"github.com/chfanghr/WTFCarProject/raspi"
 	"sync"
 )
 

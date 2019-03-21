@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/chfanghr/Backend/car"
-	"github.com/chfanghr/Backend/hardware"
-	"github.com/chfanghr/Backend/location"
+	"github.com/chfanghr/WTFCarProject/car"
+	"github.com/chfanghr/WTFCarProject/hardware"
+	"github.com/chfanghr/WTFCarProject/location"
 	"log"
 	"math/rand"
 )

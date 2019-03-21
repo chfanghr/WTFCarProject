@@ -1,4 +1,4 @@
-module github.com/chfanghr/Backend
+module github.com/chfanghr/WTFCarProject
 
 go 1.12
 

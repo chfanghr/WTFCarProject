@@ -1,7 +1,7 @@
 package generalir
 
 import (
-	"github.com/chfanghr/Backend/hardware"
+	"github.com/chfanghr/WTFCarProject/hardware"
 	"sync"
 )
 
