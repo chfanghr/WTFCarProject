@@ -29,5 +29,5 @@ jobs:
           name: Collect Binary Files
           command: sudo mkdir /build;sudo chmod +666 /build;cp ./build/backend_arduino.* ./build/backsrv ./build/backsrv_arm /build
       - run:
-          name: Pack Up Binary Files
+          name: Pack Up Binary Files And Upload
           command: tar -cf build.tar /build;mv build.tar /build;./.circleci/upload_binary_package.sh
