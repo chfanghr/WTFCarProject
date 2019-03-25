@@ -1,1 +1,2 @@
-arduino --verify --board arduino:avr:nano $PWD/cmd/backsrv/backend_arduino/backend_arduino.ino
+cmake $CMD/backsrv/backend_arduino/
+make -j4
