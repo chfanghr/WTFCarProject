@@ -27,4 +27,4 @@ jobs:
           command: ./.circleci/build_backend_arduino.sh
       - run:
           name: Collect Binary Files
-          command: sudo mkdir /build;sudo chmod +666 build;cp ./build/backend_arduino.* ./build/backsrv ./build/backsrv_arm /build
+          command: sudo mkdir /build;sudo chmod +666 /build;cp ./build/backend_arduino.* ./build/backsrv ./build/backsrv_arm /build
