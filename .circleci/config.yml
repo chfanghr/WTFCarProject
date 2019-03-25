@@ -7,11 +7,14 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Build Golang Code
-          command: GO111MODULE=on GOOS=linux go get -v -d ./...
+          name: Get Dependencies
+          command: GO111MODULE=on go get -v -d ./...
+      - run:
+          name: Build backsrv
+          command: GO111MODULE=on GOOS=linux go build -v ./cmd/backsrv/
       - run:
           name: Build Golang Code (ARM)
-          command: GO111MODULE=on GOARCH=arm GOOS=linux go get -v -d ./...
+          command: GO111MODULE=on GOARCH=arm GOOS=linux go build -v ./cmd/backsrv/
       - run:
           name: Make Installation Scripts Executable
           command: sudo chmod -R +x ./.circleci/*.sh
