@@ -4,7 +4,9 @@
 
 //#define DEBUG
 using namespace ArduinoJson;
-
+const int CommandGpio = 0, CommandIr = 1, CommandSerial = 2, CommandSerialHost = 3, CommandData = 4;
+const int GpioPinmode = 0, GpioDigitalwrite = 1, GpioDigitalread = 2, GpioAnalogwrite = 3, GpioAnalogread = 4;
+const int CommandSucceed = 1, CommandFailed = 0;
 DynamicJsonDocument JsonMessage(100);
 int CommandType;
 int CommandMethod;
@@ -15,21 +17,20 @@ int Param = 0;
 const uint8_t i2c_addr = 9;
 
 void setup() {
-    #ifdef DEBUG
+#ifdef DEBUG
     Serial.begin(9600);
-    #endif
+#endif
     Wire.begin(i2c_addr);
-    Wire.onRequest(requestEvent);
     Wire.onReceive(receiveEvent);
 }
 
 void receiveEvent(int) {
     DeserializationError error = deserializeJson(JsonMessage, Wire);
     if (error) {
-        #ifdef DEBUG
+#ifdef DEBUG
         Serial.print(F("deserializeJson() failed: "));
         Serial.println(error.c_str());
-        #endif
+#endif
         return;
     }
 
@@ -41,75 +42,74 @@ void receiveEvent(int) {
     JsonMessage.clear();
 
     switch (CommandType) {
-        case 0:
+        case CommandGpio:
             //CommandGpio
             switch (CommandMethod) {
-                case 0:
+                case GpioPinmode:
                     //GpioPinmode
                     switch (PinValue) {
-                        case 0:
+                        case 0://INPUT Mode
                             pinMode(PinNumber, INPUT);
                             break;
 
-                        case 1:
+                        case 1://INPUT_PULLUP Mode
                             pinMode(PinNumber, INPUT_PULLUP);
                             break;
-                        case 2:
+                        case 2://INPUT_PULLDOWN Mode
                             pinMode(PinNumber, INPUT);
                             break;
-                        case 3:
+                        case 3://OUTPUT Mode
                             pinMode(PinNumber, OUTPUT);
 
                     }
 
-                case 1:
+                case GpioDigitalwrite:
                     //GpioDigitalwrite
                     switch (PinValue) {
-                        case 0:
+                        case HIGH:
                             digitalWrite(PinNumber, HIGH);
                             break;
-                        case 1:
+                        case LOW:
                             digitalWrite(PinNumber, LOW);
                             break;
                     }
-                case 2:
+                case GpioDigitalread:
                     //GpioDigitalread
                     Param = digitalRead(PinNumber);
                     break;
-                case 3:
+                case GpioAnalogwrite:
                     //GpioAnalogwrite
                     analogWrite(PinNumber, PinValue);
                     break;
-                case 4:
+                case GpioAnalogread:
                     //GpioAnalogread
                     Param = analogRead(PinNumber);
                     break;
                 default:
                     goto error;
             }
-        case 1:
+        case CommandIr:
             //CommandIr
-        case 2:
+        case CommandSerial:
             //CommandSerial
-        case 3:
+        case CommandSerialHost:
             //CommandSerialHost
-        case 4:
+        case CommandData:
             //CommandData
         default:
         error:
+#ifdef DEBUG
             Serial.print("Operation failed.");
-            CommandStatus = 0;
+#endif
+            CommandStatus = CommandFailed;
     }
-
-
-}
-
-void requestEvent() {
     JsonMessage["type"] = CommandType;
     JsonMessage["status"] = CommandStatus;
     JsonArray CommandParam = JsonMessage.createNestedArray("param");
     CommandParam.add(Param);
     serializeJson(JsonMessage, Wire);
+    CommandStatus = CommandSucceed;
+
 }
 
 void loop() {
