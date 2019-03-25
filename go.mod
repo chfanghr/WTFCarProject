@@ -3,6 +3,6 @@ module github.com/chfanghr/WTFCarProject
 go 1.12
 
 require (
-	github.com/felixge/tcpkeepalive v0.0.0-20160804073959-5bb0b2dea91e
-	golang.org/x/sys v0.0.0-20190318195719-6c81ef8f67ca
+	github.com/chfanghr/cleanuphandler v0.0.0-20190325060424-026771ff264a
+	golang.org/x/sys v0.0.0-20190322080309-f49334f85ddc
 )

@@ -2,10 +2,10 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/chfanghr/WTFCarProject/car"
 	"github.com/chfanghr/WTFCarProject/hardware"
+	"github.com/chfanghr/cleanuphandler"
 	"io"
 	"io/ioutil"
 	"log"
@@ -52,9 +52,9 @@ func SetupPidFile(pidFilePath string) error {
 		if err != nil {
 			return err
 		}
-		CleanUpFuncs.Add(func(i *log.Logger) {
+		cleanuphandler.AddCleanupHandlers(func(i *log.Logger) {
 			i.Println("remove pid file")
-			os.Remove(pidFilePath)
+			_ = os.Remove(pidFilePath)
 		})
 		return nil
 	}
@@ -120,16 +120,15 @@ func LoadCarService(configFile string) (car.Service, error) {
 		Logger.Println("load fake car")
 		return LoadFakeCarService()
 	}
-	return nil, errors.New("unknown error")
 }
 
-func LoadDefaultCarService() (car.Service, error) {
-	c, err := NewCar(DefaultI2CAddr, DefaultI2CBus, DefaultMotorAIN1, DefaultMotorAIN2, DefaultMotorBIN1, DefaultMotorBIN2, DefaultIRPin, DefaultBluetoothHost, DefaultIBeaconName, DefaultIbeaconUUID)
-	if err != nil {
-		return nil, err
-	}
-	return car.NewGeneralServiceHandler(c), nil
-}
+//func LoadDefaultCarService() (car.Service, error) {
+//	c, err := NewCar(DefaultI2CAddr, DefaultI2CBus, DefaultMotorAIN1, DefaultMotorAIN2, DefaultMotorBIN1, DefaultMotorBIN2, DefaultIRPin, DefaultBluetoothHost, DefaultIBeaconName, DefaultIbeaconUUID)
+//	if err != nil {
+//		return nil, err
+//	}
+//	return car.NewGeneralServiceHandler(c), nil
+//}
 
 func LoadFakeCarService() (car.Service, error) {
 	return car.NewGeneralServiceHandler(NewFakeCar(Logger)), nil
