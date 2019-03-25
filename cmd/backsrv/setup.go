@@ -13,20 +13,20 @@ import (
 	"os"
 )
 
-const (
-	DefaultI2CAddr uint8 = 0x30
-	DefaultI2CBus  int   = 0
-
-	DefaultMotorAIN1 hardware.PinNumber = 3
-	DefaultMotorAIN2 hardware.PinNumber = 5
-	DefaultMotorBIN1 hardware.PinNumber = 6
-	DefaultMotorBIN2 hardware.PinNumber = 9
-	DefaultIRPin     hardware.PinNumber = 11
-
-	DefaultBluetoothHost string = "hci0"
-	DefaultIBeaconName   string = "Car"
-	DefaultIbeaconUUID   string = "c3468b29-38a3-4d80-a921-908450fcdd0e"
-)
+//const (
+//	DefaultI2CAddr uint8 = 0x30
+//	DefaultI2CBus  int   = 0
+//
+//	DefaultMotorAIN1 hardware.PinNumber = 3
+//	DefaultMotorAIN2 hardware.PinNumber = 5
+//	DefaultMotorBIN1 hardware.PinNumber = 6
+//	DefaultMotorBIN2 hardware.PinNumber = 9
+//	DefaultIRPin     hardware.PinNumber = 11
+//
+//	DefaultBluetoothHost string = "hci0"
+//	DefaultIBeaconName   string = "Car"
+//	DefaultIbeaconUUID   string = "c3468b29-38a3-4d80-a921-908450fcdd0e"
+//)
 
 type Config struct {
 	I2CAddr uint8 `json:"i2c_addr"`
