@@ -8,6 +8,9 @@ jobs:
       - checkout
       - run:
           name: Build Golang Code
+          command: GO111MODULE=on GOOS=linux go get -v -d ./...
+      - run:
+          name: Build Golang Code (ARM)
           command: GO111MODULE=on GOARCH=arm GOOS=linux go get -v -d ./...
       - run:
           name: Make Installation Scripts Executable
