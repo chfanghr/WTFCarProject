@@ -1,2 +1,2 @@
-cmake $CMD/backsrv/backend_arduino/
+cmake $CMD/cmd/backsrv/backend_arduino/
 make -j4
