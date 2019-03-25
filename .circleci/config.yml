@@ -7,7 +7,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: build golang code
+          name: Build Golang Code
           command: GO111MODULE=on GOARCH=arm GOOS=linux go get -v -d ./...
       - run:
           name: Make Installation Scripts Executable
