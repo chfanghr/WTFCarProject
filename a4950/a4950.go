@@ -41,11 +41,8 @@ func (a *A4950) Forward(d time.Duration) error {
 		if d == 0 {
 			return nil
 		}
-		ch := time.After(d)
-		select {
-		case <-ch:
-			return a.Brake()
-		}
+		<-time.After(d)
+		return a.brake()
 	})
 }
 
@@ -54,18 +51,15 @@ func (a *A4950) Backward(d time.Duration) error {
 		err1 := a.i1.DigitalWrite(hardware.GpioLow)
 		err2 := a.i2.DigitalWrite(hardware.GpioHigh)
 		if err := checkErrors(err1, err2); err != nil {
-			a.Brake()
+			_ = a.brake()
 			return err
 		}
 
 		if d == 0 {
 			return nil
 		}
-		ch := time.After(d)
-		select {
-		case <-ch:
-			return a.Brake()
-		}
+		<-time.After(d)
+		return a.brake()
 	})
 }
 
@@ -74,17 +68,14 @@ func (a *A4950) ChopForward(v hardware.PinValue, d time.Duration) error {
 		err1 := a.i1.DigitalWrite(hardware.GpioHigh)
 		err2 := a.i2.AnalogWrite(v)
 		if err := checkErrors(err1, err2); err != nil {
-			a.Brake()
+			_ = a.brake()
 			return err
 		}
 		if d == 0 {
 			return nil
 		}
-		ch := time.After(d)
-		select {
-		case <-ch:
-			return a.Brake()
-		}
+		<-time.After(d)
+		return a.brake()
 	})
 }
 
@@ -93,37 +84,41 @@ func (a *A4950) ChopReverse(v hardware.PinValue, d time.Duration) error {
 		err1 := a.i2.DigitalWrite(hardware.GpioHigh)
 		err2 := a.i1.AnalogWrite(v)
 		if err := checkErrors(err1, err2); err != nil {
-			a.Brake()
+			_ = a.brake()
 			return err
 		}
 
 		if d == 0 {
 			return nil
 		}
-		ch := time.After(d)
-		select {
-		case <-ch:
-			return a.Brake()
-		}
+		<-time.After(d)
+		return a.brake()
 	})
 }
 
 func (a *A4950) Brake() error {
 	return a.withMutex(func() error {
-		err1 := a.i1.DigitalWrite(hardware.GpioHigh)
-		err2 := a.i2.DigitalWrite(hardware.GpioHigh)
-		return checkErrors(err1, err2)
+		return a.brake()
 	})
+}
+
+func (a *A4950) brake() error {
+	err1 := a.i1.DigitalWrite(hardware.GpioHigh)
+	err2 := a.i2.DigitalWrite(hardware.GpioHigh)
+	return checkErrors(err1, err2)
 }
 
 func (a *A4950) Coast() error {
 	return a.withMutex(func() error {
-		err1 := a.i1.DigitalWrite(hardware.GpioLow)
-		err2 := a.i2.DigitalWrite(hardware.GpioLow)
-		return checkErrors(err1, err2)
+		return a.coast()
 	})
 }
 
+func (a *A4950) coast() error {
+	err1 := a.i1.DigitalWrite(hardware.GpioLow)
+	err2 := a.i2.DigitalWrite(hardware.GpioLow)
+	return checkErrors(err1, err2)
+}
 func (a *A4950) withMutex(job func() error) error {
 	a.m.Lock()
 	defer a.m.Unlock()
