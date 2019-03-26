@@ -1,45 +1,83 @@
 package blockmap
 
-type ID struct{ x, y int }
+import "github.com/chfanghr/WTFCarProject/blockmap/bfs"
 
-type block struct{ isBarrier bool }
+type block struct {
+	x, y      int
+	idx       int
+	isBarrier bool
+}
 
-type blockmap struct{ blocks [][]block }
+type BlockMap struct {
+	blocks    [][]block
+	idxBlocks map[int]*block
+}
 
-func (i *ID) Init(x, y int) {
-	if x > 0 && y > 0 {
-		i.x, i.y = x, y
-		return
-	}
-	i.x, i.y = 0, 0
-}
-func (i *ID) IncreaseX() { i.x++ }
-func (i *ID) IncreaseY() { i.y++ }
-func (i *ID) DecreaseX() {
-	if i.x--; i.x < 0 {
-		i.x = 0
-	}
-}
-func (i *ID) DecreaseY() {
-	if i.y--; i.y < 0 {
-		i.y = 0
-	}
-}
-func (i *ID) GetX() int             { return i.x }
-func (i *ID) GetY() int             { return i.y }
-func (i *ID) MoveUpDiagonally()     { i.IncreaseX(); i.IncreaseY() }
-func (i *ID) MoveDownDiagonally()   { i.DecreaseX(); i.DecreaseY() }
-func (i *ID) IsEqualTo(id *ID) bool { return id.x == i.x && id.y == i.y }
-
-func (b *blockmap) IsValidID(id *ID) bool {
-	if id.y > len(b.blocks) || id.x > len(b.blocks[0]) {
-		return false
-	}
-	return true
-}
-func (b *blockmap) GetBlock(id *ID) *block {
-	if !b.IsValidID(id) {
+func NewBlockMap(sizeX, sizeY int) *BlockMap {
+	if sizeX <= 0 || sizeY <= 0 {
 		return nil
 	}
-	return &b.blocks[id.y][id.x]
+	blm := &BlockMap{}
+	blm.idxBlocks = make(map[int]*block)
+
+	tmpBlks := make([]block, sizeX*sizeY)
+	for i := 0; i < len(tmpBlks); i++ {
+		blm.idxBlocks[i] = &tmpBlks[i]
+		tmpBlks[i].idx = i
+	}
+
+	blm.blocks = make([][]block, sizeY)
+	for i := 0; i < sizeY; i++ {
+		blm.blocks[i] = tmpBlks[:sizeX]
+		tmpBlks = tmpBlks[sizeX:]
+	}
+
+	return blm
+}
+
+func (b *BlockMap) toGraph() *bfs.Graph {
+	g := bfs.NewGraph()
+	for k, v := range b.idxBlocks {
+		bs := b.getRelatedBlocks(v)
+		for _, v := range bs {
+			g.AddEdge(k, v.idx)
+		}
+	}
+	return g
+}
+
+func (b *BlockMap) getRelatedBlocks(blk *block) (res []*block) {
+	left := b.getBlock(blk.x-1, blk.y)
+	right := b.getBlock(blk.x+1, blk.y)
+	below := b.getBlock(blk.x, blk.y-1)
+	above := b.getBlock(blk.x, blk.y+1)
+
+	//* obliquely *
+	loa := b.getBlock(blk.x-1, blk.y+1)
+	lob := b.getBlock(blk.x-1, blk.y-1)
+	roa := b.getBlock(blk.x+1, blk.y+1)
+	rob := b.getBlock(blk.x+1, blk.y-1)
+
+	tmp := []*block{left, right, below, above, loa, lob, roa, rob}
+	for _, v := range tmp {
+		if v != nil {
+			res = append(res, v)
+		}
+	}
+	return
+}
+
+func (b *BlockMap) getBlock(x, y int) *block {
+	if !b.isBlockExist(x, y) {
+		return nil
+	}
+	return &b.blocks[y][x]
+}
+
+func (b *BlockMap) isBlockExist(x, y int) bool {
+	return x > 0 && x < len(b.blocks[0]) && 0 < y && y < len(b.blocks)
+}
+
+func (b *BlockMap) Size() (x, y int) {
+	return len(b.blocks[0]), len(b.blocks)
 }
