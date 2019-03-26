@@ -17,6 +17,9 @@ jobs:
           name: Build backsrv (ARM)
           command: cd build;GO111MODULE=on GOARCH=arm GOOS=linux go build -v -o backsrv_arm ../cmd/backsrv/
       - run:
+          name: Build simplecli
+          command: cd build;GO111MODULE=on GOOS=linux go build -v -o simplecli ../cmd/simplecli
+      - run:
           name: Make Installation Scripts Executable
           command: sudo chmod -R +x ./.circleci/*.sh
       - run:
