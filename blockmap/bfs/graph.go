@@ -14,7 +14,6 @@ func NewGraph() *Graph {
 	g := &Graph{}
 	g.Adjacencies = make(map[int]*Bag)
 	return g
-
 }
 
 //AddEdge add an edge v-w
@@ -80,7 +79,7 @@ func (g *Graph) Degree(v int) int {
 // MaxDegree computes the max degree
 func (g *Graph) MaxDegree() int {
 	max := 0
-	for v, _ := range g.Adjacencies {
+	for v := range g.Adjacencies {
 		currentDegree := g.Degree(v)
 		if currentDegree > max {
 			max = currentDegree
