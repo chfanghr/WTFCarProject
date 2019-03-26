@@ -1,4 +1,4 @@
-package simplecli
+package main
 
 import (
 	"flag"
