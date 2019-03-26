@@ -6,10 +6,13 @@ jobs:
     working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
     steps:
       - checkout
-      - run: mkdir build
+      - run: mkdir build;sudo mkdir /build;sudo chmod +666 /build;
       - run:
           name: Get Dependencies
           command: GO111MODULE=on go get -v -d ./...
+        -run:
+          name: Build simplecli
+          command: cd build;GO111MODULE=on GOOS=linux go build -v -o simplecli ../cmd/simplecli/
       - run:
           name: Build backsrv
           command: cd build;GO111MODULE=on GOOS=linux go build -v -o backsrv ../cmd/backsrv/
@@ -27,7 +30,7 @@ jobs:
           command: ./.circleci/build_backend_arduino.sh
       - run:
           name: Collect Binary Files
-          command: sudo mkdir /build;sudo chmod +666 /build;cp ./build/backend_arduino.* ./build/backsrv ./build/backsrv_arm /build
+          command: cd build;cp backend_arduino.* simplecli backsrv backsrv_arm /build
       - run:
           name: Pack Up Binary Files And Upload
           command: tar -cf build.tar /build;mv build.tar /build;./.circleci/upload_binary_package.sh
