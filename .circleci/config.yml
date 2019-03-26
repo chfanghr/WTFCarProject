@@ -10,9 +10,6 @@ jobs:
       - run:
           name: Get Dependencies
           command: GO111MODULE=on go get -v -d ./...
-        -run:
-          name: Build simplecli
-          command: cd build;GO111MODULE=on GOOS=linux go build -v -o simplecli ../cmd/simplecli/
       - run:
           name: Build backsrv
           command: cd build;GO111MODULE=on GOOS=linux go build -v -o backsrv ../cmd/backsrv/
