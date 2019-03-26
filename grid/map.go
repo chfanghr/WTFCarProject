@@ -1,6 +1,6 @@
-package blockmap
+package grid
 
-import "github.com/chfanghr/WTFCarProject/blockmap/bfs"
+import "github.com/chfanghr/WTFCarProject/grid/bfs"
 
 type block struct {
 	x, y      int
@@ -95,6 +95,18 @@ func (b *BlockMap) SetBarrier(x, y int, s bool) {
 	}
 }
 
-func (b *BlockMap) GetShortestPath(fromX, fromY, toX, toY int) []struct{ x, y int } {
-	return nil
+func (b *BlockMap) GetShortestPath(fromX, fromY, toX, toY int) (res []struct{ x, y int }) {
+	if !(b.isBlockExist(fromX, fromY) && b.isBlockExist(toX, toY)) {
+		return nil
+	}
+	g := b.toGraph()
+	resChan := bfs.NewBFSPath(g, b.getBlock(fromX, fromY).idx).PathTo(b.getBlock(toX, toY).idx)
+	var resIdxes []int
+	for v := range resChan {
+		resIdxes = append(resIdxes, v.(int))
+	}
+	for _, v := range resIdxes {
+		res = append(res, struct{ x, y int }{x: b.idxBlocks[v].x, y: b.idxBlocks[v].y})
+	}
+	return
 }
