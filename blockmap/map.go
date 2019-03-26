@@ -24,6 +24,7 @@ func NewBlockMap(sizeX, sizeY int) *BlockMap {
 	for i := 0; i < len(tmpBlks); i++ {
 		blm.idxBlocks[i] = &tmpBlks[i]
 		tmpBlks[i].idx = i
+		tmpBlks[i].isBarrier = false
 	}
 
 	blm.blocks = make([][]block, sizeY)
@@ -38,8 +39,14 @@ func NewBlockMap(sizeX, sizeY int) *BlockMap {
 func (b *BlockMap) toGraph() *bfs.Graph {
 	g := bfs.NewGraph()
 	for k, v := range b.idxBlocks {
+		if v.isBarrier {
+			continue
+		}
 		bs := b.getRelatedBlocks(v)
 		for _, v := range bs {
+			if v.isBarrier {
+				continue
+			}
 			g.AddEdge(k, v.idx)
 		}
 	}
@@ -75,9 +82,19 @@ func (b *BlockMap) getBlock(x, y int) *block {
 }
 
 func (b *BlockMap) isBlockExist(x, y int) bool {
-	return x > 0 && x < len(b.blocks[0]) && 0 < y && y < len(b.blocks)
+	return 0 < x && x < len(b.blocks[0]) && 0 < y && y < len(b.blocks)
 }
 
 func (b *BlockMap) Size() (x, y int) {
 	return len(b.blocks[0]), len(b.blocks)
+}
+
+func (b *BlockMap) SetBarrier(x, y int, s bool) {
+	if b.isBlockExist(x, y) {
+		b.getBlock(x, y).isBarrier = s
+	}
+}
+
+func (b *BlockMap) GetShortestPath(fromX, fromY, toX, toY int) []struct{ x, y int } {
+	return nil
 }
