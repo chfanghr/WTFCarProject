@@ -48,7 +48,7 @@ func (b *BFSPath) HasPathTo(v int) bool {
 	return ok
 }
 
-// PathTo return a the shortest path between the vertice and the source.
+// PathTo return a the shortest path between the vertices and the source.
 func (b *BFSPath) PathTo(v int) <-chan interface{} {
 	stack := NewStackArray()
 	if b.HasPathTo(v) {
