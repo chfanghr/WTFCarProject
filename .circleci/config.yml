@@ -32,5 +32,7 @@ jobs:
           name: Collect Binary Files
           command: cd build;cp backend_arduino.* simplecli backsrv backsrv_arm /build
       - run:
-          name: Pack Up Binary Files And Upload
-          command: tar -cf build.tar /build;mv build.tar /build;./.circleci/upload_binary_package.sh
+          name: Pack Up Binary Files
+          command: tar -cf build.tar /build;mv build.tar /build
+      - store_artifacts:
+          path: /build/build.tar
