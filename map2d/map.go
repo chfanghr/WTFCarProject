@@ -1,4 +1,4 @@
-package client
+package map2d
 
 import (
 	"encoding/json"
@@ -7,7 +7,7 @@ import (
 	"math"
 )
 
-type mapData struct {
+type Map2d struct {
 	Map struct {
 		Size struct {
 			X float64 `json:"x"`
@@ -20,8 +20,8 @@ type mapData struct {
 	} `json:"map"`
 }
 
-func newMapData(raw []byte) (*mapData, error) {
-	res := &mapData{}
+func NewMap2d(raw []byte) (*Map2d, error) {
+	res := &Map2d{}
 	err := json.Unmarshal(raw, res)
 	if err != nil {
 		return nil, err
@@ -29,8 +29,25 @@ func newMapData(raw []byte) (*mapData, error) {
 	return res, nil
 }
 
-func (m *mapData) isValid() bool {
+func (m *Map2d) isValid() bool {
 	return m.Map.Size.X > 0 && m.Map.Size.Y > 0 && func() bool {
+		for _, b := range m.Map.Barriers {
+			isOutOfMap := func(p location.Point2D) bool {
+				return !(p.GetX() > m.Map.Size.X || p.GetY() > m.Map.Size.Y || p.GetX() < 0 || p.GetY() < 0)
+			}
+			for _, p := range b.Required {
+				if !isOutOfMap(p) {
+					return false
+				}
+			}
+			for _, p := range b.Optional {
+				if !isOutOfMap(p) {
+					return false
+				}
+			}
+		}
+		return true
+	}() && func() bool {
 		for _, b := range m.Map.Barriers {
 			tmp := append(b.Optional, b.Required[1:]...)
 			if b.Required[0].IsOnSameLine(tmp...) {
@@ -41,7 +58,7 @@ func (m *mapData) isValid() bool {
 	}()
 }
 
-func (m *mapData) toGrid() *grid.Grid {
+func (m *Map2d) toGrid() *grid.Grid {
 	if m.Map.Size.X+1 > math.MaxInt32 || m.Map.Size.Y+1 > math.MaxInt32 {
 		return nil
 	}
