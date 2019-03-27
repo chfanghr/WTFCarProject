@@ -33,20 +33,25 @@ func (p Point2D) DistanceTo(d Point2D) float64 {
 }
 
 func (p Point2D) IsOnSameLine(ps ...Point2D) bool {
-	//if len(ps) < 2 {
-	//	return true
-	//}
-	//ps = append(ps, p)
-	//if s, diff := p.IsTheSame(ps...); !s || diff < 3 {
-	//	return true
-	//}
-	//
-	//ks := make(map[float64]struct{})
-	//for _, v := range ps {
-	//	big.NewFloat(1)
-	//	//k:=(v.y-p.y)/(v.x-p.x)
-	//}
-	panic(nil) //TODO
+	if len(ps) == 1 {
+		return true
+	}
+	if s, diff := p.IsTheSame(ps...); !s || diff < 3 {
+		return true
+	}
+	type vector [2]float64
+	var vectors = make(map[vector]struct{})
+	for _, v := range ps {
+		vectors[vector{p.x - v.x, p.y - v.y}] = struct{}{}
+	}
+	for k1 := range vectors {
+		for k2 := range vectors {
+			if math.Round(k1[0]*k2[1]-k1[1]*k2[0]) != 0 {
+				return false
+			}
+		}
+	}
+	return true
 }
 
 func (p Point2D) IsTheSame(ps ...Point2D) (bool, int) {
