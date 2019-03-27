@@ -21,7 +21,7 @@ func NewBlockMap(sizeX, sizeY int) *BlockMap {
 	blm.idxBlocks = make(map[int]*block)
 
 	tmpBlks := make([]block, sizeX*sizeY)
-	for i := 0; i < len(tmpBlks); i++ {
+	for i := range tmpBlks {
 		blm.idxBlocks[i] = &tmpBlks[i]
 		tmpBlks[i].idx = i
 		tmpBlks[i].isBarrier = false

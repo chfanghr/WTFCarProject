@@ -1,7 +1,6 @@
 package client
 
 import (
-	"github.com/chfanghr/WTFCarProject/grid"
 	"github.com/chfanghr/WTFCarProject/location"
 )
 
@@ -25,22 +24,15 @@ import (
 }
 */
 
-type Map struct {
+type mapData struct {
 	Map struct {
 		Size struct {
-			//size of map in mile
 			X float64 `json:"x"`
 			Y float64 `json:"y"`
 		} `json:"size"`
 		Barriers []struct {
-			//barriers represents the barriers in map
-			//there should be at least three points to locate an area
-			First  location.Point2D   `json:"first"`
-			Second location.Point2D   `json:"second"`
-			Third  location.Point2D   `json:"third"`
-			Extra  []location.Point2D `json:"extra"`
+			Required [3]location.Point2D `json:"required"`
+			Optional []location.Point2D  `json:"optional"`
 		} `json:"barriers"`
 	} `json:"map"`
 }
-
-func (m *Map) toGrid() *grid.BlockMap { panic(nil /*TODO:implement this*/) }

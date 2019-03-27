@@ -24,10 +24,10 @@ jobs:
           command: sudo chmod -R +x ./.circleci/*.sh
       - run:
           name: Install Arduino Toolchain
-          command: ./.circleci/install_arduino_toolchain.sh
+          command: ./.circleci/install.sh
       - run:
           name: Build backend_arduino
-          command: ./.circleci/build_backend_arduino.sh
+          command: cd build;cmake ../cmd/backsrv/backend_arduino/;make -j4
       - run:
           name: Collect Binary Files
           command: cd build;cp backend_arduino.* simplecli backsrv backsrv_arm /build
