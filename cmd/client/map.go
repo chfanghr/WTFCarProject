@@ -1,6 +1,7 @@
 package client
 
 import (
+	"encoding/json"
 	"github.com/chfanghr/WTFCarProject/grid"
 	"github.com/chfanghr/WTFCarProject/location"
 	"math"
@@ -17,6 +18,15 @@ type mapData struct {
 			Optional []location.Point2D  `json:"optional"`
 		} `json:"barriers"`
 	} `json:"map"`
+}
+
+func newMapData(raw []byte) (*mapData, error) {
+	res := &mapData{}
+	err := json.Unmarshal(raw, res)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
 }
 
 func (m *mapData) isValid() bool {

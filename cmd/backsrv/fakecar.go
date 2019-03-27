@@ -4,6 +4,7 @@ import (
 	"github.com/chfanghr/WTFCarProject/car"
 	"github.com/chfanghr/WTFCarProject/hardware"
 	"github.com/chfanghr/WTFCarProject/location"
+	_ "github.com/gorilla/websocket"
 	"log"
 )
 
