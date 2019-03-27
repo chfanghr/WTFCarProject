@@ -8,16 +8,16 @@ type block struct {
 	isBarrier bool
 }
 
-type BlockMap struct {
+type Grid struct {
 	blocks    [][]block
 	idxBlocks map[int]*block
 }
 
-func NewBlockMap(sizeX, sizeY int) *BlockMap {
+func NewGrid(sizeX, sizeY int) *Grid {
 	if sizeX <= 0 || sizeY <= 0 {
 		return nil
 	}
-	blm := &BlockMap{}
+	blm := &Grid{}
 	blm.idxBlocks = make(map[int]*block)
 
 	tmpBlks := make([]block, sizeX*sizeY)
@@ -36,7 +36,7 @@ func NewBlockMap(sizeX, sizeY int) *BlockMap {
 	return blm
 }
 
-func (b *BlockMap) toGraph() *bfs.Graph {
+func (b *Grid) toGraph() *bfs.Graph {
 	g := bfs.NewGraph()
 	for k, v := range b.idxBlocks {
 		if v.isBarrier {
@@ -53,7 +53,7 @@ func (b *BlockMap) toGraph() *bfs.Graph {
 	return g
 }
 
-func (b *BlockMap) getRelatedBlocks(blk *block) (res []*block) {
+func (b *Grid) getRelatedBlocks(blk *block) (res []*block) {
 	left := b.getBlock(blk.x-1, blk.y)
 	right := b.getBlock(blk.x+1, blk.y)
 	below := b.getBlock(blk.x, blk.y-1)
@@ -74,28 +74,28 @@ func (b *BlockMap) getRelatedBlocks(blk *block) (res []*block) {
 	return
 }
 
-func (b *BlockMap) getBlock(x, y int) *block {
+func (b *Grid) getBlock(x, y int) *block {
 	if !b.isBlockExist(x, y) {
 		return nil
 	}
 	return &b.blocks[y][x]
 }
 
-func (b *BlockMap) isBlockExist(x, y int) bool {
+func (b *Grid) isBlockExist(x, y int) bool {
 	return 0 < x && x < len(b.blocks[0]) && 0 < y && y < len(b.blocks)
 }
 
-func (b *BlockMap) Size() (x, y int) {
+func (b *Grid) Size() (x, y int) {
 	return len(b.blocks[0]), len(b.blocks)
 }
 
-func (b *BlockMap) SetBarrier(x, y int, s bool) {
+func (b *Grid) SetBarrier(x, y int, s bool) {
 	if b.isBlockExist(x, y) {
 		b.getBlock(x, y).isBarrier = s
 	}
 }
 
-func (b *BlockMap) GetShortestPath(fromX, fromY, toX, toY int) (res []struct{ x, y int }) {
+func (b *Grid) GetShortestPath(fromX, fromY, toX, toY int) (res []struct{ x, y int }) {
 	if !(b.isBlockExist(fromX, fromY) && b.isBlockExist(toX, toY)) {
 		return nil
 	}

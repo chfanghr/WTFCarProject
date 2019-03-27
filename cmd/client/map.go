@@ -1,28 +1,10 @@
 package client
 
 import (
+	"github.com/chfanghr/WTFCarProject/grid"
 	"github.com/chfanghr/WTFCarProject/location"
+	"math"
 )
-
-//example of a map json message
-/*
-{
-	"map":{
-		"size":{
-			"x": 100,
-			"y": 100
-		},
-		"barriers": [
-			{
-			"first":{"x": 1,"y": 1},
-			"second":{"x": 50,"y": 32},
-			"third":{"x": 77,"y": 12},
-			"extra":[{"x": 55,"y": 88}]
-			}
-		]
-	}
-}
-*/
 
 type mapData struct {
 	Map struct {
@@ -35,4 +17,27 @@ type mapData struct {
 			Optional []location.Point2D  `json:"optional"`
 		} `json:"barriers"`
 	} `json:"map"`
+}
+
+func (m *mapData) isValid() bool {
+	//return m.Map.Size.X>0&&m.Map.Size.Y>0&&func()bool{
+	//	for _,b:=range m.Map.Barriers{
+	//		for _,b:=range b.Required{
+	//
+	//		}
+	//	}
+	//	return true
+	//}()
+	panic(nil) //TODO
+}
+func (m *mapData) toGrid() *grid.Grid {
+	if m.Map.Size.X+1 > math.MaxInt32 || m.Map.Size.Y+1 > math.MaxInt32 {
+		return nil
+	}
+	gridX, gridY := int(m.Map.Size.X+1), int(m.Map.Size.Y+1)
+	grid := grid.NewGrid(gridX, gridY)
+	if grid == nil {
+		return nil
+	}
+	panic(nil) //TODO
 }

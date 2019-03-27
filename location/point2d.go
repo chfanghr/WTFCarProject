@@ -1,6 +1,8 @@
 package location
 
-import "math"
+import (
+	"math"
+)
 
 type Point2D struct {
 	x, y float64
@@ -28,4 +30,36 @@ func (p Point2D) GetY() float64 {
 
 func (p Point2D) DistanceTo(d Point2D) float64 {
 	return math.Sqrt((p.x-d.x)*(p.x-d.x) + (p.y-d.y)*(p.y-d.y))
+}
+
+func (p Point2D) IsOnSameLine(ps ...Point2D) bool {
+	//if len(ps) < 2 {
+	//	return true
+	//}
+	//ps = append(ps, p)
+	//if s, diff := p.IsTheSame(ps...); !s || diff < 3 {
+	//	return true
+	//}
+	//
+	//ks := make(map[float64]struct{})
+	//for _, v := range ps {
+	//	big.NewFloat(1)
+	//	//k:=(v.y-p.y)/(v.x-p.x)
+	//}
+	panic(nil) //TODO
+}
+
+func (p Point2D) IsTheSame(ps ...Point2D) (bool, int) {
+	if len(ps)+1 < 2 {
+		return true, 0
+	}
+	tmpMap := make(map[Point2D]struct{})
+	for _, v := range ps {
+		tmpMap[v] = struct{}{}
+	}
+	tmpMap[p] = struct{}{}
+	if len(tmpMap) < 3 {
+		return true, 0
+	}
+	return false, len(tmpMap)
 }
