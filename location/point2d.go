@@ -50,16 +50,16 @@ func (p Point2D) IsOnSameLine(ps ...Point2D) bool {
 }
 
 func (p Point2D) IsTheSame(ps ...Point2D) (bool, int) {
-	if len(ps)+1 < 2 {
-		return true, 0
+	if len(ps)+1 == 1 {
+		return true, 1
 	}
 	tmpMap := make(map[Point2D]struct{})
 	for _, v := range ps {
 		tmpMap[v] = struct{}{}
 	}
 	tmpMap[p] = struct{}{}
-	if len(tmpMap) < 3 {
-		return true, 0
+	if len(tmpMap) == 1 {
+		return true, 1
 	}
 	return false, len(tmpMap)
 }
