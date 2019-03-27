@@ -1,11 +1,13 @@
 package main
 
 import (
+	"flag"
 	"github.com/chfanghr/WTFCarProject/car"
 	"github.com/chfanghr/WTFCarProject/hardware"
 	"github.com/chfanghr/WTFCarProject/location"
-	_ "github.com/gorilla/websocket"
+	"github.com/gorilla/websocket"
 	"log"
+	"net/http"
 )
 
 type FakeCar struct {
@@ -14,15 +16,63 @@ type FakeCar struct {
 	l                  *log.Logger
 }
 
-func NewFakeCar(l *log.Logger) *FakeCar {
+var InitialMessage = "Hello World!!"
+var current string
+var addr = flag.String("addr", "localhost:8080", "http service address")
 
-	//TODO Create a goroutine inside this constructor to provide websocket service and other staff
+var upgrader = websocket.Upgrader{}
+
+func Worker(w http.ResponseWriter, r *http.Request) {
+	c, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Print("upgrade:", err)
+		return
+	}
+	defer c.Close()
+
+	for {
+		mt, message, err := c.ReadMessage()
+		if err != nil {
+			log.Println("read:", err)
+			break
+		}
+		if message != nil {
+			err = c.WriteMessage(mt, []byte(InitialMessage))
+			if err != nil {
+				log.Println("write:", err)
+				break
+			}
+		}
+
+		//TODO get the current
+		err = c.WriteMessage(mt, []byte(current))
+		if err != nil {
+			log.Println("write:", err)
+			break
+		}
+	}
+}
+
+func NewFakeCar(l *log.Logger) *FakeCar {
+	var p *location.Point2D
+	p.SetX(0)
+	p.SetY(0)
+
+	go func() {
+		flag.Parse()
+		http.HandleFunc("/Worker", Worker)
+		log.Fatal(http.ListenAndServe(*addr, nil))
+
+	}() //TODO Create a goroutine inside this constructor to provide websocket service and other staff
 	return &FakeCar{
-		l: l,
+		current:            p,
+		lastmovementstatus: car.Succeeded,
+		l:                  l,
 	}
 }
 func (f *FakeCar) GetLocation() (location.Point2D, error) {
 	f.l.Println("FakeCar.GetLocation() called")
+	f.current.GetX()
 	return *f.current, nil
 }
 func (f *FakeCar) MoveTo(l location.Point2D) error {
