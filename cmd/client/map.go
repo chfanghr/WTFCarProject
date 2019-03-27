@@ -20,23 +20,24 @@ type mapData struct {
 }
 
 func (m *mapData) isValid() bool {
-	//return m.Map.Size.X>0&&m.Map.Size.Y>0&&func()bool{
-	//	for _,b:=range m.Map.Barriers{
-	//		for _,b:=range b.Required{
-	//
-	//		}
-	//	}
-	//	return true
-	//}()
-	panic(nil) //TODO
+	return m.Map.Size.X > 0 && m.Map.Size.Y > 0 && func() bool {
+		for _, b := range m.Map.Barriers {
+			tmp := append(b.Optional, b.Required[1:]...)
+			if b.Required[0].IsOnSameLine(tmp...) {
+				return false
+			}
+		}
+		return true
+	}()
 }
+
 func (m *mapData) toGrid() *grid.Grid {
 	if m.Map.Size.X+1 > math.MaxInt32 || m.Map.Size.Y+1 > math.MaxInt32 {
 		return nil
 	}
 	gridX, gridY := int(m.Map.Size.X+1), int(m.Map.Size.Y+1)
-	grid := grid.NewGrid(gridX, gridY)
-	if grid == nil {
+	g := grid.NewGrid(gridX, gridY)
+	if g == nil {
 		return nil
 	}
 	panic(nil) //TODO
