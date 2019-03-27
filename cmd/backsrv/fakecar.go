@@ -9,12 +9,13 @@ import (
 )
 
 type FakeCar struct {
-	current *location.Point2D
-	//TODO Store last movement status here
-	l *log.Logger
+	current            *location.Point2D
+	lastmovementstatus int
+	l                  *log.Logger
 }
 
 func NewFakeCar(l *log.Logger) *FakeCar {
+
 	//TODO Create a goroutine inside this constructor to provide websocket service and other staff
 	return &FakeCar{
 		l: l,
@@ -25,6 +26,7 @@ func (f *FakeCar) GetLocation() (location.Point2D, error) {
 	return *f.current, nil
 }
 func (f *FakeCar) MoveTo(l location.Point2D) error {
+	*f.current = l
 	f.l.Println("FakeCar.MoveTo() called:", l)
 	return nil
 }
