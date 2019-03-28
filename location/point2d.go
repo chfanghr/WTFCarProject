@@ -33,7 +33,7 @@ func (p Point2D) DistanceTo(d Point2D) float64 {
 }
 
 func (p Point2D) IsOnSameLine(ps ...Point2D) bool {
-	if len(ps) == 1 {
+	if len(ps) == 1 || len(ps) == 0 {
 		return true
 	}
 	if s, diff := p.IsTheSame(ps...); !s || diff < 3 {

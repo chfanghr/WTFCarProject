@@ -131,5 +131,5 @@ func LoadCarService(configFile string) (car.Service, error) {
 //}
 
 func LoadFakeCarService() (car.Service, error) {
-	return car.NewGeneralServiceHandler(NewFakeCar(Logger)), nil
+	return car.NewGeneralServiceHandler(NewFakeCar(Logger, fca)), nil
 }
