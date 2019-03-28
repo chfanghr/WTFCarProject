@@ -72,7 +72,6 @@ func NewFakeCar(l *log.Logger) *FakeCar {
 }
 func (f *FakeCar) GetLocation() (location.Point2D, error) {
 	f.l.Println("FakeCar.GetLocation() called")
-	f.current.GetX()
 	return *f.current, nil
 }
 func (f *FakeCar) MoveTo(l location.Point2D) error {
