@@ -5,7 +5,6 @@ import (
 	"github.com/chfanghr/WTFCarProject/grid"
 	"github.com/chfanghr/WTFCarProject/location"
 	"math"
-	"sort"
 )
 
 type Map2D struct {
@@ -68,62 +67,26 @@ func init() {
 	}
 }
 
-type gridPosition struct{ x, y int }
-type vector2D struct{ x, y int }
+type grid2D struct{ x, y int }
 
-func angleBetween(v1, v2 vector2D) float64 {
-	return math.Acos(float64(v1.x*v2.x+v1.y*v2.y) / (vecLen(v1) * vecLen(v2)))
+func pointToGrid2D(p location.Point2D) (res grid2D) {
+	res.x = int(math.Round(p.GetX()))
+	res.y = int(math.Round(p.GetY()))
+	return
 }
-func vecLen(v vector2D) float64 {
-	return math.Sqrt(float64(v.x*v.x + v.y*v.y))
-}
-func isGridPositionInTriangle(p gridPosition, tri [3]gridPosition) bool {
-	var xs, ys []int
-	for _, trip := range tri {
-		xs = append(xs, trip.x)
-		ys = append(ys, trip.y)
-	}
-	sort.Ints(xs)
-	sort.Ints(ys)
-	if p.x > xs[len(xs)-1] || p.y > ys[len(xs)-1] {
-		return false
-	}
-	var dists = make(map[float64]gridPosition)
-	for _, trip := range tri {
-		x2 := float64((p.x - trip.x) * (p.x - trip.x))
-		y2 := float64((p.y - trip.y) * (p.y - trip.y))
-		dists[math.Sqrt(x2+y2)] = trip
-	}
-	var p1, p2, p3 gridPosition
-	var keys []float64
-	for k := range dists {
-		keys = append(keys, k)
-	}
-	sort.Float64s(keys)
-	if len(keys) == 2 {
-		p1, p2 = dists[keys[1]], dists[keys[1]]
-	} else {
-		p1, p2 = dists[keys[2]], dists[keys[1]]
-	}
-	p3 = dists[keys[0]]
-	p1p := vector2D{p.x - p1.x, p.y - p1.y}
-	p2p := vector2D{p.x - p2.x, p.y - p2.y}
-	p1p3 := vector2D{p3.x - p1.x, p3.y - p1.y}
-	p2p3 := vector2D{p3.x - p2.x, p3.y - p2.y}
-	p1p2 := vector2D{p2.x - p1.x, p2.y - p1.y}
-	p2p1 := vector2D{0 - p1p2.x, 0 - p1p2.y}
-
-	if ap1p2p1p3, ap1pp1p3 := angleBetween(p1p2, p1p3), angleBetween(p1p, p1p3); ap1pp1p3 > ap1p2p1p3 {
-		return false
-	}
-	if ap2p1p2p3, ap2pp2p3 := angleBetween(p2p1, p2p3), angleBetween(p2p, p2p3); ap2pp2p3 > ap2p1p2p3 {
-		return false
-	}
-	return true
-}
-func pointToGridPosition(ps ...location.Point2D) (res []gridPosition) {
+func pointsToGrid2DArray(ps ...location.Point2D) (res []grid2D) {
 	for _, p := range ps {
-		res = append(res, gridPosition{x: int(p.GetY() / perGridSize), y: int(p.GetY() / perGridSize)})
+		res = append(res, pointToGrid2D(p))
+	}
+	return
+}
+func grid2DToFloatArray(g grid2D) (res []float64) {
+	res = append(res, float64(g.x), float64(g.y))
+	return
+}
+func grid2DsToFloat2DArray(gs ...grid2D) (res [][]float64) {
+	for _, g := range gs {
+		res = append(res, grid2DToFloatArray(g))
 	}
 	return
 }
@@ -133,10 +96,19 @@ func (m *Map2D) toGrid() *grid.Grid {
 	}
 	gridXSize, gridYSize := int(m.Map.Size.X/perGridSize), int(m.Map.Size.Y/perGridSize)
 	g := grid.NewGrid(gridXSize, gridYSize)
-
-	//for _, b := range m.Map.Barriers {
-	//	//TODO
-	//	//ps := pointToGridPosition(append(b.Optional, b.Required[:]...)...)
-	//}
+	var barriers [][][]float64
+	for _, b := range m.Map.Barriers {
+		barrier := grid2DsToFloat2DArray(pointsToGrid2DArray(append(b.Optional, b.Required[:]...)...)...)
+		barriers = append(barriers, barrier)
+	}
+	for x := 0; x < gridXSize; x++ {
+		for y := 0; y < gridYSize; y++ {
+			for _, b := range barriers {
+				if InPolygon([]float64{float64(x), float64(y)}, b) {
+					g.SetBarrier(x, y, true)
+				}
+			}
+		}
+	}
 	return g
 }
