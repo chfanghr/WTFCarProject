@@ -5,6 +5,7 @@ import (
 	"github.com/chfanghr/WTFCarProject/car"
 	"github.com/chfanghr/WTFCarProject/hardware"
 	"github.com/chfanghr/WTFCarProject/location"
+	"github.com/chfanghr/WTFCarProject/rpcprotocal"
 	"github.com/gorilla/websocket"
 	_ "github.com/gorilla/websocket"
 	"log"
@@ -21,9 +22,9 @@ type FakeCar struct {
 	wss      wsService
 }
 type message struct {
-	CurrentLocation  *location.Point2D `json:"cur,omitempty"`
-	DestineLocation  *location.Point2D `json:"dest,omitempty"`
-	StopMovementFlag bool              `json:"stop,omitempty"`
+	CurrentLocation  *rpcprotocal.Point2D `json:"cur,omitempty"`
+	DestineLocation  *rpcprotocal.Point2D `json:"dest,omitempty"`
+	StopMovementFlag bool                 `json:"stop,omitempty"`
 }
 
 func NewFakeCar(l *log.Logger, listenAddr string) *FakeCar {
@@ -36,8 +37,9 @@ func NewFakeCar(l *log.Logger, listenAddr string) *FakeCar {
 		}
 		conn := newWsConnection(l, ws)
 		res.mu.Lock()
-		_ = conn.WriteJSON(message{CurrentLocation: res.current})
+		cur := *res.current
 		res.mu.Unlock()
+		_ = conn.WriteJSON(message{CurrentLocation: rpcprotocal.Point2DFromLocationPoint2D(cur)})
 		res.wss.AddConnection(conn)
 	})
 	go l.Fatalln(http.ListenAndServe(listenAddr, http.DefaultServeMux))
@@ -53,7 +55,7 @@ func (f *FakeCar) MoveTo(l location.Point2D) error {
 	f.mu.Lock()
 	f.current = &l
 	f.mu.Unlock()
-	return f.wss.Update(message{DestineLocation: &l})
+	return f.wss.Update(message{DestineLocation: rpcprotocal.Point2DFromLocationPoint2D(l)})
 }
 func (f *FakeCar) LastMovementStatus() int {
 	//always success
