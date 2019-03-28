@@ -24,7 +24,7 @@ type FakeCar struct {
 type message struct {
 	CurrentLocation  *rpcprotocal.Point2D `json:"cur,omitempty"`
 	DestineLocation  *rpcprotocal.Point2D `json:"dest,omitempty"`
-	StopMovementFlag bool                 `json:"stop,omitempty"`
+	StopMovementFlag *bool                `json:"stop,omitempty"`
 }
 
 func NewFakeCar(l *log.Logger, listenAddr string) *FakeCar {
@@ -42,7 +42,11 @@ func NewFakeCar(l *log.Logger, listenAddr string) *FakeCar {
 		_ = conn.WriteJSON(message{CurrentLocation: rpcprotocal.Point2DFromLocationPoint2D(cur)})
 		res.wss.AddConnection(conn)
 	})
-	go l.Fatalln(http.ListenAndServe(listenAddr, http.DefaultServeMux))
+	go func() {
+		if err := http.ListenAndServe(listenAddr, http.DefaultServeMux); err != nil {
+			l.Fatalln(err)
+		}
+	}()
 	res.current = new(location.Point2D)
 	return res
 }
@@ -62,7 +66,8 @@ func (f *FakeCar) LastMovementStatus() int {
 	return car.Succeeded //FIXME
 }
 func (f *FakeCar) StopMovement() error {
-	return f.wss.Update(message{StopMovementFlag: true})
+	tmp := true
+	return f.wss.Update(message{StopMovementFlag: &tmp})
 }
 func (f *FakeCar) IRSend(ir hardware.IRData) error {
 	//need no implementation because there's no simulation

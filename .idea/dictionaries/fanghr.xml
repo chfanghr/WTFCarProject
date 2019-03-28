@@ -2,6 +2,7 @@
   <dictionary name="fanghr">
     <words>
       <w>adjacencies</w>
+      <w>wsurl</w>
     </words>
   </dictionary>
 </component>
