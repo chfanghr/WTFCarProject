@@ -46,7 +46,7 @@ func (g GeneralClient) MoveTo(l location.Point2D) (err error) {
 	if err != nil {
 		return err
 	}
-	err = cl.Call(g.serviceName+".MoveTo", l, new(int))
+	err = cl.Call(g.serviceName+".MoveTo", *rpcprotocal.Point2DFromLocationPoint2D(l), new(int))
 	return
 }
 

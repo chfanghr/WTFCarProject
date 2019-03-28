@@ -15,7 +15,7 @@ import (
 
 type FakeCar struct {
 	mu      *sync.Mutex
-	current *location.Point2D
+	current location.Point2D
 	//lastMovementStatus int//currently not needed
 	l        *log.Logger
 	upgrader websocket.Upgrader
@@ -37,7 +37,7 @@ func NewFakeCar(l *log.Logger, listenAddr string) *FakeCar {
 		}
 		conn := newWsConnection(l, ws)
 		res.mu.Lock()
-		cur := *res.current
+		cur := res.current
 		res.mu.Unlock()
 		_ = conn.WriteJSON(message{CurrentLocation: rpcprotocal.Point2DFromLocationPoint2D(cur)})
 		res.wss.AddConnection(conn)
@@ -47,17 +47,17 @@ func NewFakeCar(l *log.Logger, listenAddr string) *FakeCar {
 			l.Fatalln(err)
 		}
 	}()
-	res.current = new(location.Point2D)
+	res.current = *location.NewPoint2D(0, 0)
 	return res
 }
 func (f *FakeCar) GetLocation() (location.Point2D, error) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
-	return *f.current, nil
+	return f.current, nil
 }
 func (f *FakeCar) MoveTo(l location.Point2D) error {
 	f.mu.Lock()
-	f.current = &l
+	f.current = l
 	f.mu.Unlock()
 	return f.wss.Update(message{DestineLocation: rpcprotocal.Point2DFromLocationPoint2D(l)})
 }

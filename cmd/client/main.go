@@ -25,7 +25,7 @@ const webPage = "index.html"
 
 var (
 	webPageData []byte
-	mapData     *map2d.Map2d
+	mapData     *map2d.Map2D
 )
 
 func init() {

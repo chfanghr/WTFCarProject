@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"github.com/chfanghr/WTFCarProject/grid"
 	"github.com/chfanghr/WTFCarProject/location"
-	"math"
 )
 
-type Map2d struct {
+const perGridSize = 0.01
+
+type Map2D struct {
 	Map struct {
 		Size struct {
 			X float64 `json:"x"`
@@ -20,16 +21,15 @@ type Map2d struct {
 	} `json:"map"`
 }
 
-func NewMap2d(raw []byte) (*Map2d, error) {
-	res := &Map2d{}
+func NewMap2d(raw []byte) (*Map2D, error) {
+	res := &Map2D{}
 	err := json.Unmarshal(raw, res)
 	if err != nil {
 		return nil, err
 	}
 	return res, nil
 }
-
-func (m *Map2d) isValid() bool {
+func (m *Map2D) isValid() bool {
 	return m.Map.Size.X > 0 && m.Map.Size.Y > 0 &&
 		func() bool {
 			for _, b := range m.Map.Barriers {
@@ -59,15 +59,25 @@ func (m *Map2d) isValid() bool {
 			return true
 		}()
 }
-
-func (m *Map2d) toGrid() *grid.Grid {
-	if m.Map.Size.X+1 > math.MaxInt32 || m.Map.Size.Y+1 > math.MaxInt32 {
+func (m *Map2D) toGrid() *grid.Grid {
+	if !m.isValid() {
 		return nil
 	}
-	gridX, gridY := int(m.Map.Size.X+1), int(m.Map.Size.Y+1)
-	g := grid.NewGrid(gridX, gridY)
-	if g == nil {
-		return nil
+	gridXSize, gridYSize := int(m.Map.Size.X/perGridSize), int(m.Map.Size.Y/perGridSize)
+	g := grid.NewGrid(gridXSize, gridYSize)
+	var barriers [][][]float64
+	for _, b := range m.Map.Barriers {
+		barrier := grid2DsToFloat2DArray(pointsToGrid2DArray(append(b.Optional, b.Required[:]...)...)...)
+		barriers = append(barriers, barrier)
 	}
-	panic(nil) //TODO
+	for x := 0; x < gridXSize; x++ {
+		for y := 0; y < gridYSize; y++ {
+			for _, b := range barriers {
+				if InPolygon([]float64{float64(x), float64(y)}, b) {
+					g.SetBarrier(x, y, true)
+				}
+			}
+		}
+	}
+	return g
 }
