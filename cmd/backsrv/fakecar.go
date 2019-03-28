@@ -45,12 +45,14 @@ func NewFakeCar(l *log.Logger, listenAddr string) *FakeCar {
 	return res
 }
 func (f *FakeCar) GetLocation() (location.Point2D, error) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
 	return *f.current, nil
 }
 func (f *FakeCar) MoveTo(l location.Point2D) error {
 	f.mu.Lock()
-	defer f.mu.Unlock()
 	f.current = &l
+	f.mu.Unlock()
 	return f.wss.Update(message{DestineLocation: &l})
 }
 func (f *FakeCar) LastMovementStatus() int {
