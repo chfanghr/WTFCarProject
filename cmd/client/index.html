@@ -5,10 +5,62 @@
     <title>client</title>
 </head>
 <body>
+<canvas id="c" width="600" height="600"></canvas>
 <script>
+    let SizeX;
+    let SizeY;
     let mapData = {{.MapData}};
     let map = JSON.parse(mapData);
-    let wsURL =;{{.WSURL}}
+    let wsURL ="8.8.8.8:8887";
+    let c = document.getElementById("c");
+    let ctx = c.getContext("2d");
+    SizeX = map.map.size.x;
+    SizeY = map.map.size.y;
+
+    //Create a map and a barriers
+    c.setAttribute('width', SizeX);
+    c.setAttribute('height', SizeY);
+    for (let i = 0; i < 2; i++) {
+        ctx.moveTo(map.map.barriers.required[i].x, map.map.barriers.required[i].y);
+        ctx.lineTo(map.map.barriers.required[i + 1].x, map.map.barriers.required[i + 1].y);
+    }
+    ctx.moveTo(map.map.barriers.required[2].x, map.map.barriers.required[2].y);
+    if (map.map.barriers.optional.length) {
+        ctx.lineTo(map.map.barriers.optional[0].x, map.map.barriers.optional[0].y);
+        for (let i = 0; i < map.map.barriers.optional.length - 1; i++) {
+            ctx.moveTo(map.map.barriers.optional[i].x, map.map.barriers.optional[i].y);
+            ctx.lineTo(map.map.barriers.optional[i + 1].x, map.map.barriers.optional[i + 1].y);
+        }
+        ctx.moveTo(map.map.barriers.optional[map.map.barriers.optional.length - 1].x, map.map.barriers.optional[map.map.barriers.optional.length - 1].y);
+
+    }
+    ctx.lineTo(map.map.barriers.required[0].x, map.map.barriers.required[0].y);
+
+
+    if (window["WebSocket"]) {
+        conn = new WebSocket(wsURL);
+        conn.onclose = function (evt) {
+            ctx.moveTo(0,0);
+            ctx.lineTo(200,200);
+            ctx.moveTo(200,0);
+            ctx.lineTo(0,200);
+        };
+        conn.onmessage = function (evt) {
+            let messagesData = evt.data.split('\n');
+            let message = JSON.parse(messagesData);
+            if (message.cur){
+                ctx.moveTo(message.cur.x,message.cur.y);
+            }else if (message.dest){
+                ctx.lineTo(message.dest.x,message.dest.y);
+            }else if (message.stop){
+                //do nothing.
+            }
+
+
+        }
+    }
+    //Do something with map
 </script>
+
 </body>
 </html>
