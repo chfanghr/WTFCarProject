@@ -1,9 +1,12 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"flag"
 	"github.com/chfanghr/WTFCarProject/map2d"
 	"github.com/chfanghr/cleanuphandler"
+	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -73,11 +76,24 @@ func serve() {
 	}
 }
 
-func processWebPage(d *map2d.Map2d, h []byte) {
-	//TODO HANDLE WEB PAGE HERE
+func processWebPage() {
+	t, err := template.New("webpage").Parse(string(webPageData))
+	if err != nil {
+		logger.Fatalln(err)
+	}
+	buf := bytes.NewBuffer([]byte{})
+	mapData, _ := json.Marshal(mapData)
+	if err = t.Execute(buf, struct {
+		MapData string
+	}{
+		MapData: string(mapData),
+	}); err != nil {
+		logger.Fatalln(err)
+	}
+	webPageData = buf.Bytes()
 }
 
 func main() {
-	processWebPage(mapData, webPageData)
+	processWebPage()
 	serve()
 }
