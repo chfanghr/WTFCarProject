@@ -84,7 +84,7 @@ func SetupLogger(logFilePath string, useStdio bool) (logger *log.Logger, err err
 		if useStdio {
 			w = stdio
 		} else {
-			f, _ := os.Open("/dev/null")
+			f, _ := os.Open(os.DevNull)
 			w = f
 		}
 	}
