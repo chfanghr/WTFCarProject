@@ -15,6 +15,7 @@ import (
 
 var ServiceName = "backendService"
 var Logger *log.Logger
+var fca string
 
 func main() {
 	pidFilePath := flag.String("pidFile", fmt.Sprint(""), "path to pid file")
@@ -24,10 +25,13 @@ func main() {
 	closeStdio := flag.Bool("closeStdio", false, "daemon close stdio or not")
 	listenNetwork := flag.String("listenNetwork", "tcp", "rpc server listen to which type of network")
 	listenAddress := flag.String("listenAddress", "0.0.0.0:8888", "rpc server listen to which address")
+	fakeCarAddress := flag.String("fakeCarAddress", "0.0.0.0:8887", "address of fakeCar's http service ")
 	//networkTimeout := flag.Duration("networkTimeout", time.Second*5, "connection timeout")
 	cpuProfile := flag.String("cpuProfile", "", "path to cpu profile")
 	flag.StringVar(&ServiceName, "serviceName", ServiceName, "name of rpc service")
 	flag.Parse()
+
+	fca = *fakeCarAddress
 
 	if *cpuProfile != "" {
 		profile, err := os.Create(*cpuProfile)

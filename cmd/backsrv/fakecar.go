@@ -19,7 +19,7 @@ type FakeCar struct {
 	wss      wsService
 }
 
-func NewFakeCar(l *log.Logger) *FakeCar {
+func NewFakeCar(l *log.Logger, listenAddr string) *FakeCar {
 	res := &FakeCar{}
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		ws, err := res.upgrader.Upgrade(w, r, nil)
@@ -29,6 +29,7 @@ func NewFakeCar(l *log.Logger) *FakeCar {
 		}
 		res.wss.AddConnection(newWsConnection(l, ws))
 	})
+	go l.Fatalln(http.ListenAndServe(listenAddr, http.DefaultServeMux))
 	res.current = new(location.Point2D)
 	return res
 }
