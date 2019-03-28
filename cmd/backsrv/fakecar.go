@@ -1,42 +1,52 @@
 package main
 
 import (
+	"fmt"
 	"github.com/chfanghr/WTFCarProject/car"
 	"github.com/chfanghr/WTFCarProject/hardware"
 	"github.com/chfanghr/WTFCarProject/location"
+	"github.com/gorilla/websocket"
 	_ "github.com/gorilla/websocket"
 	"log"
+	"net/http"
 )
 
 type FakeCar struct {
 	current *location.Point2D
-	//TODO Store last movement status here
-	l *log.Logger
+	//lastMovementStatus int//currently not needed
+	l        *log.Logger
+	upgrader websocket.Upgrader
+	wss      wsService
 }
 
 func NewFakeCar(l *log.Logger) *FakeCar {
-	//TODO Create a goroutine inside this constructor to provide websocket service and other staff
-	return &FakeCar{
-		l: l,
-	}
+	res := &FakeCar{}
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		ws, err := res.upgrader.Upgrade(w, r, nil)
+		if err != nil {
+			l.Println("error upgrade ws", err)
+			return
+		}
+		res.wss.AddConnection(newWsConnection(l, ws))
+	})
+	res.current = new(location.Point2D)
+	return res
 }
 func (f *FakeCar) GetLocation() (location.Point2D, error) {
-	f.l.Println("FakeCar.GetLocation() called")
 	return *f.current, nil
 }
 func (f *FakeCar) MoveTo(l location.Point2D) error {
-	f.l.Println("FakeCar.MoveTo() called:", l)
+	f.l.Println("FakeCar.MoveTo() called:", l) //TODO implement this method
 	return nil
 }
 func (f *FakeCar) LastMovementStatus() int {
-	f.l.Println("LastMovementStatus() called")
-	return car.Succeeded
+	//always success
+	return car.Succeeded //FIXME
 }
 func (f *FakeCar) StopMovement() error {
-	f.l.Println(" StopMovement() called")
-	return nil
+	return fmt.Errorf("not implemented") //TODO implement this method
 }
 func (f *FakeCar) IRSend(ir hardware.IRData) error {
-	f.l.Println("IRSend() called")
-	return nil
+	//need no implementation because there's no simulation
+	return fmt.Errorf("not implemented")
 }
