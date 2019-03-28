@@ -14,10 +14,11 @@ import (
 )
 
 var (
-	logFile   = flag.String("log", "", "path to log file")
-	serveAddr = flag.String("addr", "localhost:8886", "address to serve on")
-	mapFile   = flag.String("map", "map.json", "path to <map>.json")
-	logger    *log.Logger
+	logFile       = flag.String("log", "", "path to log file")
+	serveAddr     = flag.String("addr", "localhost:8886", "address to serve on")
+	mapFile       = flag.String("map", "map.json", "path to <map>.json")
+	fakeCarWSHost = flag.String("fakeCarWS", "localhost:8887", "hostname/IP to fakeCarService")
+	logger        *log.Logger
 )
 
 const webPage = "index.html"
@@ -85,8 +86,10 @@ func processWebPage() {
 	mapData, _ := json.Marshal(mapData)
 	if err = t.Execute(buf, struct {
 		MapData string
+		WSURL   string
 	}{
-		MapData: string(mapData),
+		string(mapData),
+		"ws://" + *fakeCarWSHost + "/",
 	}); err != nil {
 		logger.Fatalln(err)
 	}
