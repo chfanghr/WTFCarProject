@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"github.com/chfanghr/WTFCarProject/grid"
 	"github.com/chfanghr/WTFCarProject/location"
-	"math"
 )
+
+const perGridSize = 0.01
 
 type Map2D struct {
 	Map struct {
@@ -57,38 +58,6 @@ func (m *Map2D) isValid() bool {
 			}
 			return true
 		}()
-}
-
-const perGridSize = 0.01
-
-func init() {
-	if perGridSize <= 0 {
-		panic(nil)
-	}
-}
-
-type grid2D struct{ x, y int }
-
-func pointToGrid2D(p location.Point2D) (res grid2D) {
-	res.x = int(math.Round(p.GetX()))
-	res.y = int(math.Round(p.GetY()))
-	return
-}
-func pointsToGrid2DArray(ps ...location.Point2D) (res []grid2D) {
-	for _, p := range ps {
-		res = append(res, pointToGrid2D(p))
-	}
-	return
-}
-func grid2DToFloatArray(g grid2D) (res []float64) {
-	res = append(res, float64(g.x), float64(g.y))
-	return
-}
-func grid2DsToFloat2DArray(gs ...grid2D) (res [][]float64) {
-	for _, g := range gs {
-		res = append(res, grid2DToFloatArray(g))
-	}
-	return
 }
 func (m *Map2D) toGrid() *grid.Grid {
 	if !m.isValid() {

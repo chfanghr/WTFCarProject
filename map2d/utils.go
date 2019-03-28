@@ -1,5 +1,10 @@
 package map2d
 
+import (
+	"github.com/chfanghr/WTFCarProject/location"
+	"math"
+)
+
 func euqal(x float64, y float64) bool {
 	v := x - y
 	const delta float64 = 1e-6
@@ -9,7 +14,6 @@ func euqal(x float64, y float64) bool {
 	return false
 
 }
-
 func little(x float64, y float64) bool {
 	if euqal(x, y) {
 		return false
@@ -69,4 +73,28 @@ func InPolygon(point []float64, vertices [][]float64) bool {
 
 	}
 	return is_in
+}
+
+type grid2D struct{ x, y int }
+
+func pointToGrid2D(p location.Point2D) (res grid2D) {
+	res.x = int(math.Round(p.GetX()))
+	res.y = int(math.Round(p.GetY()))
+	return
+}
+func pointsToGrid2DArray(ps ...location.Point2D) (res []grid2D) {
+	for _, p := range ps {
+		res = append(res, pointToGrid2D(p))
+	}
+	return
+}
+func grid2DToFloatArray(g grid2D) (res []float64) {
+	res = append(res, float64(g.x), float64(g.y))
+	return
+}
+func grid2DsToFloat2DArray(gs ...grid2D) (res [][]float64) {
+	for _, g := range gs {
+		res = append(res, grid2DToFloatArray(g))
+	}
+	return
 }

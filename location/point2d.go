@@ -39,14 +39,9 @@ func (p Point2D) IsOnSameLine(ps ...Point2D) bool {
 	if s, diff := p.IsTheSame(ps...); !s || diff < 3 {
 		return true
 	}
-	type vector [2]float64
-	var vectors = make(map[vector]struct{})
-	for _, v := range ps {
-		vectors[vector{p.x - v.x, p.y - v.y}] = struct{}{}
-	}
-	for k1 := range vectors {
-		for k2 := range vectors {
-			if math.Round(k1[0]*k2[1]-k1[1]*k2[0]) != 0 {
+	for i, p1 := range ps {
+		for _, p2 := range ps[i:] {
+			if !isPointInSegments(p1, p2, p) {
 				return false
 			}
 		}
@@ -67,4 +62,13 @@ func (p Point2D) IsTheSame(ps ...Point2D) (bool, int) {
 		return true, 1
 	}
 	return false, len(tmpMap)
+}
+
+func isPointInSegments(Pi Point2D, Pj Point2D, Q Point2D) bool {
+	if (Q.x-Pi.x)*(Pj.y-Pi.y) == (Pj.x-Pi.x)*(Q.y-Pi.y) &&
+		math.Min(Pi.x, Pj.x) <= Q.x && Q.x <= math.Max(Pi.x, Pj.x) &&
+		math.Min(Pi.y, Pj.y) <= Q.x && Q.y <= math.Max(Pi.y, Pj.y) {
+		return true
+	}
+	return false
 }
