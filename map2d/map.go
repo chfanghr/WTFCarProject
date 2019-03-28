@@ -30,32 +30,34 @@ func NewMap2d(raw []byte) (*Map2d, error) {
 }
 
 func (m *Map2d) isValid() bool {
-	return m.Map.Size.X > 0 && m.Map.Size.Y > 0 && func() bool {
-		for _, b := range m.Map.Barriers {
-			isOutOfMap := func(p location.Point2D) bool {
-				return !(p.GetX() > m.Map.Size.X || p.GetY() > m.Map.Size.Y || p.GetX() < 0 || p.GetY() < 0)
+	return m.Map.Size.X > 0 && m.Map.Size.Y > 0 &&
+		func() bool {
+			for _, b := range m.Map.Barriers {
+				isOutOfMap := func(p location.Point2D) bool {
+					return !(p.GetX() > m.Map.Size.X || p.GetY() > m.Map.Size.Y || p.GetX() < 0 || p.GetY() < 0)
+				}
+				for _, p := range b.Required {
+					if !isOutOfMap(p) {
+						return false
+					}
+				}
+				for _, p := range b.Optional {
+					if !isOutOfMap(p) {
+						return false
+					}
+				}
 			}
-			for _, p := range b.Required {
-				if !isOutOfMap(p) {
+			return true
+		}() &&
+		func() bool {
+			for _, b := range m.Map.Barriers {
+				tmp := append(b.Optional, b.Required[1:]...)
+				if b.Required[0].IsOnSameLine(tmp...) {
 					return false
 				}
 			}
-			for _, p := range b.Optional {
-				if !isOutOfMap(p) {
-					return false
-				}
-			}
-		}
-		return true
-	}() && func() bool {
-		for _, b := range m.Map.Barriers {
-			tmp := append(b.Optional, b.Required[1:]...)
-			if b.Required[0].IsOnSameLine(tmp...) {
-				return false
-			}
-		}
-		return true
-	}()
+			return true
+		}()
 }
 
 func (m *Map2d) toGrid() *grid.Grid {

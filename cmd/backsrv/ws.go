@@ -29,7 +29,9 @@ func (c *wsConnection) worker(logger *log.Logger) {
 	if _, ok := <-c.closed; !ok {
 		return
 	}
+
 	defer func() { _ = c.Close(); close(c.closed) }()
+
 	for {
 		<-time.AfterFunc(pingPeriod, func() {
 			if err := c.WriteControl(websocket.PingMessage, []byte{}, time.Now().Add(writeWait)); err != nil {
