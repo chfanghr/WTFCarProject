@@ -92,9 +92,7 @@ func main() {
 	Logger.Println("listen on :", l.Addr().String())
 
 	defer func() {
-		os.Exit(0)
-		//TODO
-		//cleanuphandler.Wait()
+		cleanuphandler.Wait()
 	}()
 
 	go func() {

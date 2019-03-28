@@ -42,7 +42,11 @@ func NewFakeCar(l *log.Logger, listenAddr string) *FakeCar {
 		_ = conn.WriteJSON(message{CurrentLocation: rpcprotocal.Point2DFromLocationPoint2D(cur)})
 		res.wss.AddConnection(conn)
 	})
-	go l.Fatalln(http.ListenAndServe(listenAddr, http.DefaultServeMux))
+	go func() {
+		if err := http.ListenAndServe(listenAddr, http.DefaultServeMux); err != nil {
+			l.Fatalln(err)
+		}
+	}()
 	res.current = new(location.Point2D)
 	return res
 }
