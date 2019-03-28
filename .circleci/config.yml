@@ -20,8 +20,8 @@ jobs:
           name: Build cmd/simplecli (amd64)
           command: cd build;GO111MODULE=on GOARCH=amd64 GOOS=linux go build -v -o simplecli ../cmd/simplecli
       - run:
-          name: Build cmd/client (amd64)
-          command: cd build;GO111MODULE=on GOARCH=amd64 GOOS=linux go build -v -o client ../cmd/client
+          name: Build cmd/webviewer (amd64)
+          command: cd build;GO111MODULE=on GOARCH=amd64 GOOS=linux go build -v -o client ../cmd/webviewer
       - run:
           name: Make Installation Scripts Executable
           command: sudo chmod -R +x ./.circleci/*.sh
