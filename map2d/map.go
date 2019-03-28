@@ -69,5 +69,5 @@ func (m *Map2d) toGrid() *grid.Grid {
 	if g == nil {
 		return nil
 	}
-	panic(nil) //TODO
+
 }

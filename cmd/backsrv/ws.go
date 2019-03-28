@@ -77,24 +77,18 @@ func (w *wsService) Update(data interface{}) error {
 	if err != nil {
 		return err
 	}
-	go func() {
-		w.Lock()
-		tmp := make([]*wsConnection, len(w.conn))
-		copy(tmp, w.conn)
-		w.Unlock()
-		var writers []io.Writer
-		for _, c := range tmp {
-			w, err := c.NextWriter(websocket.TextMessage)
-			if err != nil {
-				continue
-			}
-			writers = append(writers, w)
+	var writers []io.Writer
+	for _, c := range w.conn {
+		w, err := c.NextWriter(websocket.TextMessage)
+		if err != nil {
+			continue
 		}
-		writer := io.MultiWriter(writers...)
-		_, _ = writer.Write([]byte(msg))
-		for _, w := range writers {
-			_ = w.(io.WriteCloser).Close()
-		}
-	}()
+		writers = append(writers, w)
+	}
+	writer := io.MultiWriter(writers...)
+	_, _ = writer.Write([]byte(msg))
+	for _, w := range writers {
+		_ = w.(io.WriteCloser).Close()
+	}
 	return nil
 }
