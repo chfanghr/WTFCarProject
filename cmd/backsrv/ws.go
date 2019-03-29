@@ -54,14 +54,10 @@ func (w *wsService) AddConnection(c *wsConnection) {
 	if c == nil {
 		return
 	}
-	w.Lock()
-	defer w.Unlock()
 	w.conn = append(w.conn, c)
 	idx := len(w.conn) - 1
 	go func() {
 		<-c.closed
-		w.Lock()
-		defer w.Unlock()
 		if idx == 0 {
 			w.conn = w.conn[1:]
 			return

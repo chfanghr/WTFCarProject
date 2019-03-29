@@ -26,6 +26,8 @@ type message struct {
 	StopMovementFlag *bool                `json:"stop,omitempty"`
 }
 
+const ReadyMessage = "ready"
+
 func NewFakeCar(l *log.Logger, listenAddr string) *FakeCar {
 	res := &FakeCar{mu: new(sync.Mutex)}
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -35,10 +37,20 @@ func NewFakeCar(l *log.Logger, listenAddr string) *FakeCar {
 			l.Println("error upgrade ws", err)
 			return
 		}
+		l.Println("ws connected", ws.RemoteAddr())
 		conn := newWsConnection(l, ws)
 		res.mu.Lock()
 		cur := res.current
 		res.mu.Unlock()
+		var readyMessage struct {
+			Msg string `json:"msg"`
+		}
+		err = conn.ReadJSON(&readyMessage)
+		if err != nil || readyMessage.Msg != ReadyMessage {
+			w.WriteHeader(http.StatusServiceUnavailable)
+			return
+		}
+		l.Println("ready")
 		_ = conn.WriteJSON(message{CurrentLocation: rpcprotocal.Point2DFromLocationPoint2D(cur)})
 		res.wss.AddConnection(conn)
 	})

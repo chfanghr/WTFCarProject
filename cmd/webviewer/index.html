@@ -83,11 +83,12 @@
         drawMap();
         if (window["WebSocket"]) {
             backsrvConn = new WebSocket(backsrvWSURL);
-            backsrvConn.onclose = function (evt) {
+            backsrvConn.send(JSON.stringify({msg: "ready"}));
+            backsrvConn.onclose = function () {
                 throw Error("ws connection closed");
             };
             clientConn = new WebSocket(clientWSURL);
-            clientConn.onclose = function (evt) {
+            clientConn.onclose = function () {
                 throw Error("ws connection closed");
             };
 
