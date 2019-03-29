@@ -21,7 +21,10 @@ jobs:
           command: cd build;GO111MODULE=on GOARCH=amd64 GOOS=linux go build -v -o simplecli ../cmd/simplecli
       - run:
           name: Build cmd/webviewer (amd64)
-          command: cd build;GO111MODULE=on GOARCH=amd64 GOOS=linux go build -v -o client ../cmd/webviewer
+          command: cd build;GO111MODULE=on GOARCH=amd64 GOOS=linux go build -v -o webviewer ../cmd/webviewer
+      - run:
+          name: Build cmd/client (amd64)
+          command: cd build;GO111MODULE=on GOARCH=amd64 GOOS=linux go build -v -o client ../cmd/client
       - run:
           name: Make Installation Scripts Executable
           command: sudo chmod -R +x ./.circleci/*.sh
@@ -33,7 +36,7 @@ jobs:
           command: cd build;cmake ../cmd/backsrv/backend_arduino/;make -j4
       - run:
           name: Collect Binary Files
-          command: cd build;cp backend_arduino.* simplecli client backsrv backsrv_arm /build
+          command: cd build;cp backend_arduino.* simplecli client webviewer backsrv backsrv_arm /build
       - run:
           name: Pack Up Binary Files
           command: tar -cf build.tar /build;mv build.tar /build

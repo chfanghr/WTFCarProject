@@ -78,8 +78,8 @@ func InPolygon(point []float64, vertices [][]float64) bool {
 type grid2D struct{ x, y int }
 
 func pointToGrid2D(p location.Point2D) (res grid2D) {
-	res.x = int(math.Round(p.GetX()))
-	res.y = int(math.Round(p.GetY()))
+	res.x = int(math.Round(p.GetX()) / perGridSize)
+	res.y = int(math.Round(p.GetY()) / perGridSize)
 	return
 }
 func pointsToGrid2DArray(ps ...location.Point2D) (res []grid2D) {

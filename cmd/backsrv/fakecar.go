@@ -7,7 +7,6 @@ import (
 	"github.com/chfanghr/WTFCarProject/location"
 	"github.com/chfanghr/WTFCarProject/rpcprotocal"
 	"github.com/gorilla/websocket"
-	_ "github.com/gorilla/websocket"
 	"log"
 	"net/http"
 	"sync"

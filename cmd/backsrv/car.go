@@ -56,6 +56,7 @@ func (c *Car) GetLocation() (location.Point2D, error) {
 }
 func (c *Car) MoveTo(location.Point2D) error {
 	_, err := c.withMutex(func() (i interface{}, e error) {
+		//TODO
 		return nil, nil
 	})
 	return err

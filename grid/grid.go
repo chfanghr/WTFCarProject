@@ -95,7 +95,7 @@ func (b *Grid) SetBarrier(x, y int, s bool) {
 	}
 }
 
-func (b *Grid) GetShortestPath(fromX, fromY, toX, toY int) (res []struct{ x, y int }) {
+func (b *Grid) GetShortestPath(fromX, fromY, toX, toY int) (res []struct{ X, Y int }) {
 	if !(b.isBlockExist(fromX, fromY) && b.isBlockExist(toX, toY)) {
 		return nil
 	}
@@ -106,7 +106,7 @@ func (b *Grid) GetShortestPath(fromX, fromY, toX, toY int) (res []struct{ x, y i
 		resIdxes = append(resIdxes, v.(int))
 	}
 	for _, v := range resIdxes {
-		res = append(res, struct{ x, y int }{x: b.idxBlocks[v].x, y: b.idxBlocks[v].y})
+		res = append(res, struct{ X, Y int }{X: b.idxBlocks[v].x, Y: b.idxBlocks[v].y})
 	}
 	return
 }

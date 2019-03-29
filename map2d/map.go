@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/chfanghr/WTFCarProject/grid"
 	"github.com/chfanghr/WTFCarProject/location"
+	"github.com/chfanghr/WTFCarProject/rpcprotocal"
 )
 
 const perGridSize = 0.01
@@ -15,8 +16,8 @@ type Map2D struct {
 			Y float64 `json:"y"`
 		} `json:"size"`
 		Barriers []struct {
-			Required [3]location.Point2D `json:"required"`
-			Optional []location.Point2D  `json:"optional"`
+			Required [3]rpcprotocal.Point2D `json:"required"`
+			Optional []rpcprotocal.Point2D  `json:"optional"`
 		} `json:"barriers"`
 	} `json:"map"`
 }
@@ -37,12 +38,12 @@ func (m *Map2D) isValid() bool {
 					return !(p.GetX() > m.Map.Size.X || p.GetY() > m.Map.Size.Y || p.GetX() < 0 || p.GetY() < 0)
 				}
 				for _, p := range b.Required {
-					if !isOutOfMap(p) {
+					if !isOutOfMap(*rpcprotocal.Point2DToLocationPoint2D(p)) {
 						return false
 					}
 				}
 				for _, p := range b.Optional {
-					if !isOutOfMap(p) {
+					if !isOutOfMap(*rpcprotocal.Point2DToLocationPoint2D(p)) {
 						return false
 					}
 				}
@@ -51,8 +52,14 @@ func (m *Map2D) isValid() bool {
 		}() &&
 		func() bool {
 			for _, b := range m.Map.Barriers {
-				tmp := append(b.Optional, b.Required[1:]...)
-				if b.Required[0].IsOnSameLine(tmp...) {
+				var ps []location.Point2D
+				for _, p := range b.Required {
+					ps = append(ps, *rpcprotocal.Point2DToLocationPoint2D(p))
+				}
+				for _, p := range b.Optional {
+					ps = append(ps, *rpcprotocal.Point2DToLocationPoint2D(p))
+				}
+				if ps[0].IsOnSameLine(ps[1:]...) {
 					return false
 				}
 			}
@@ -67,7 +74,14 @@ func (m *Map2D) toGrid() *grid.Grid {
 	g := grid.NewGrid(gridXSize, gridYSize)
 	var barriers [][][]float64
 	for _, b := range m.Map.Barriers {
-		barrier := grid2DsToFloat2DArray(pointsToGrid2DArray(append(b.Optional, b.Required[:]...)...)...)
+		var ps []location.Point2D
+		for _, p := range b.Required {
+			ps = append(ps, *rpcprotocal.Point2DToLocationPoint2D(p))
+		}
+		for _, p := range b.Optional {
+			ps = append(ps, *rpcprotocal.Point2DToLocationPoint2D(p))
+		}
+		barrier := grid2DsToFloat2DArray(pointsToGrid2DArray(ps...)...)
 		barriers = append(barriers, barrier)
 	}
 	for x := 0; x < gridXSize; x++ {
@@ -80,4 +94,16 @@ func (m *Map2D) toGrid() *grid.Grid {
 		}
 	}
 	return g
+}
+
+func (m *Map2D) ComputePathTo(f, t location.Point2D) (ress []location.Point2D) {
+	if !m.isValid() {
+		return nil
+	}
+	fg, tg := pointToGrid2D(f), pointToGrid2D(t)
+	res := m.toGrid().GetShortestPath(fg.x, fg.y, tg.x, tg.y)
+	for _, v := range res {
+		ress = append(ress, *location.NewPoint2D(float64(v.X)*perGridSize, float64(v.Y)*perGridSize))
+	}
+	return
 }

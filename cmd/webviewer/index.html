@@ -1,66 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8"/>
     <title>client</title>
 </head>
+
 <body>
-<canvas id="c" width="600" height="600"></canvas>
+<canvas id="c"></canvas>
 <script>
-    let SizeX;
-    let SizeY;
-    let mapData = {{.MapData}};
-    let map = JSON.parse(mapData);
-    let wsURL ="8.8.8.8:8887";
+    const k = 1000;
+    let map = JSON.parse("{{.MapData}}");
+    let wsURL = "{{.FakeCarWSURL}}";
     let c = document.getElementById("c");
     let ctx = c.getContext("2d");
-    SizeX = map.map.size.x;
-    SizeY = map.map.size.y;
+    c.setAttribute("width", map.size.x * k);
+    c.setAttribute("height", map.size.y * k);
 
-    //Create a map and a barriers
-    c.setAttribute('width', SizeX);
-    c.setAttribute('height', SizeY);
-    for (let i = 0; i < 2; i++) {
-        ctx.moveTo(map.map.barriers.required[i].x, map.map.barriers.required[i].y);
-        ctx.lineTo(map.map.barriers.required[i + 1].x, map.map.barriers.required[i + 1].y);
+    function drawBarrier(barrier) {
+        ctx.fillStyle = "#f9f072";
+        ctx.strokeStyle = "#e31114";
+
+        ctx.moveTo(0, 0);
+        ctx.beginPath();
+        for (let p of barrier) ctx.moveTo(p.x * k, p.y * k);
+        ctx.closePath();
     }
-    ctx.moveTo(map.map.barriers.required[2].x, map.map.barriers.required[2].y);
-    if (map.map.barriers.optional.length) {
-        ctx.lineTo(map.map.barriers.optional[0].x, map.map.barriers.optional[0].y);
-        for (let i = 0; i < map.map.barriers.optional.length - 1; i++) {
-            ctx.moveTo(map.map.barriers.optional[i].x, map.map.barriers.optional[i].y);
-            ctx.lineTo(map.map.barriers.optional[i + 1].x, map.map.barriers.optional[i + 1].y);
+
+    function drawMap() {
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.moveTo(0, map.size.y * k);
+        ctx.moveTo(map.size.x * k, map.size.y * k);
+        ctx.moveTo(map.size.x * k, 0);
+        ctx.closePath();
+        ctx.fillStyle = "#c8c8c8";
+        ctx.strokeStyle = "#000000";
+        ctx.stroke();
+
+        let barriers = [];
+        for (let b of map.map.barriers) {
+            let barrier = [];
+            for (let req of b.required) barrier.push(req);
+            for (let opt of b.optional) barrier.push(opt);
+            barriers.push(barrier);
         }
-        ctx.moveTo(map.map.barriers.optional[map.map.barriers.optional.length - 1].x, map.map.barriers.optional[map.map.barriers.optional.length - 1].y);
-
+        for (let b of barriers) drawBarrier(b);
     }
-    ctx.lineTo(map.map.barriers.required[0].x, map.map.barriers.required[0].y);
 
+    function rads(x) {
+        return (Math.PI * x) / 180;
+    }
 
-    if (window["WebSocket"]) {
-        conn = new WebSocket(wsURL);
-        conn.onclose = function (evt) {
-            ctx.moveTo(0,0);
-            ctx.lineTo(200,200);
-            ctx.moveTo(200,0);
-            ctx.lineTo(0,200);
-        };
-        conn.onmessage = function (evt) {
-            let messagesData = evt.data.split('\n');
-            let message = JSON.parse(messagesData);
-            if (message.cur){
-                ctx.moveTo(message.cur.x,message.cur.y);
-            }else if (message.dest){
-                ctx.lineTo(message.dest.x,message.dest.y);
-            }else if (message.stop){
-                //do nothing.
-            }
+    function showPosition(pos) {
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y, 50, 0, rads(360), false);
+        ctx.closePath();
+        ctx.fillStyle = "#aaa";
+        ctx.strokeStyle = "#000";
+        ctx.lineWidth = 5;
+        ctx.fill();
+        ctx.stroke();
+    }
 
+    function showPathTo(pos) {
+        ctx.moveTo(pos.x, pos.y);
+        ctx.strokeStyle = "#000";
+        ctx.lineWidth = 5;
+        ctx.stroke();
+    }
 
+    let conn;
+
+    function main() {
+        drawMap();
+        if (window["WebSocket"]) {
+            conn = new WebSocket(wsURL);
+            conn.onclose = function (evt) {
+                throw Error("ws connection closed");
+            };
+            conn.onmessage = function (evt) {
+                let message = JSON.parse(evt.data);
+                if (message.cur) {
+                    message.cur.x = k * message.cur.x;
+                    message.cur.y = k * message.cur.y;
+                    showPosition(message.cur);
+                } else if (message.dest) {
+                    message.dest.x = k * message.dest.x;
+                    message.dest.y = k * message.dest.y;
+                    showPathTo(message.dest);
+                    showPosition(message.dest);
+                } else if (message.stop) {
+                }
+            };
         }
     }
-    //Do something with map
+
+    window.onload = main;
 </script>
-
 </body>
 </html>
