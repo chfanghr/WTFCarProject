@@ -17,8 +17,8 @@
     c.setAttribute("height", map.size.y * k);
 
     function drawBarrier(barrier) {
-        ctx.fillStyle = "#f9f072";
-        ctx.strokeStyle = "#e31114";
+        //ctx.fillStyle = "#f9f072";
+        //ctx.strokeStyle = "#e31114";
 
         ctx.moveTo(0, 0);
         ctx.beginPath();
@@ -33,8 +33,8 @@
         ctx.moveTo(map.size.x * k, map.size.y * k);
         ctx.moveTo(map.size.x * k, 0);
         ctx.closePath();
-        ctx.fillStyle = "#c8c8c8";
-        ctx.strokeStyle = "#000000";
+        //ctx.fillStyle = "#c8c8c8";
+        //ctx.strokeStyle = "#000000";
         ctx.stroke();
 
         let barriers = [];
@@ -55,8 +55,8 @@
         ctx.beginPath();
         ctx.arc(pos.x, pos.y, 50, 0, rads(360), false);
         ctx.closePath();
-        ctx.fillStyle = "#aaa";
-        ctx.strokeStyle = "#000";
+        //ctx.fillStyle = "#aaa";
+        //ctx.strokeStyle = "#000";
         ctx.lineWidth = 5;
         ctx.fill();
         ctx.stroke();
@@ -72,8 +72,8 @@
 
     function showPathTo(pos) {
         ctx.moveTo(pos.x, pos.y);
-        ctx.strokeStyle = "#000";
-        ctx.lineWidth = 5;
+        //ctx.strokeStyle = "#000";
+        //ctx.lineWidth = 5;
         ctx.stroke();
     }
 

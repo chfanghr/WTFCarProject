@@ -154,12 +154,14 @@ func serve() {
 			writer.WriteHeader(http.StatusServiceUnavailable)
 		}
 	})
-	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		ws, err := new(websocket.Upgrader).Upgrade(w, r, nil)
+	http.HandleFunc("/ws/", func(w http.ResponseWriter, r *http.Request) {
+		up := websocket.Upgrader{}
+		ws, err := up.Upgrade(w, r, nil)
 		if err != nil {
 			logger.Println("error upgrade ws", err)
 			return
 		}
+		logger.Println("ws connected ", ws.RemoteAddr())
 		c := newConnection(backsrv, ws)
 		go c.worker()
 		return
@@ -196,5 +198,6 @@ func processWebPage() {
 func main() {
 	processWebPage()
 	setupBacksrv()
-	serve()
+	go serve()
+	cleanuphandler.Wait()
 }
