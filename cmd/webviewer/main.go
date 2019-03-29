@@ -187,7 +187,7 @@ func processWebPage() {
 	}{
 		string(mapData),
 		"ws://" + *fakeCarWSHost + "/",
-		"ws://" + *serveAddr + "ws",
+		"ws://" + *serveAddr + "/ws",
 	}); err != nil {
 		logger.Fatalln(err)
 	}
