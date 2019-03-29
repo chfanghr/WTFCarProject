@@ -7,7 +7,7 @@
 <body>
 <canvas id="c"></canvas>
 <script>
-    const k = 1000;
+    const k = 1;
     let map = JSON.parse("{{.MapData}}");
     let backsrvWSURL = "{{.FakeCarWSURL}}";
     let clientWSURL = "{{.ClientWSURL}}}";
@@ -92,6 +92,7 @@
             };
 
             backsrvConn.onmessage = function (evt) {
+                console.log(evt);
                 let message = JSON.parse(evt.data);
                 if (message.cur) {
                     message.cur.x = k * message.cur.x;
