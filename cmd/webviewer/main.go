@@ -104,9 +104,11 @@ func (c *connection) worker() {
 	}
 }
 func newConnection(b *backend, ws *websocket.Conn) *connection {
-	return &connection{
+	tmp := &connection{
 		ws, b,
 	}
+	go tmp.worker()
+	return tmp
 }
 
 func init() {
