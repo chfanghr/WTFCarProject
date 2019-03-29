@@ -155,7 +155,7 @@ func serve() {
 		}
 	})
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		ws, err := websocket.Upgrader{}.Upgrade(w, r, nil)
+		ws, err := new(websocket.Upgrader).Upgrade(w, r, nil)
 		if err != nil {
 			logger.Println("error upgrade ws", err)
 			return
