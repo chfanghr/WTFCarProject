@@ -83,7 +83,6 @@
         drawMap();
         if (window["WebSocket"]) {
             backsrvConn = new WebSocket(backsrvWSURL);
-            backsrvConn.send(JSON.stringify({msg: "ready"}));
             backsrvConn.onclose = function () {
                 throw Error("ws connection closed");
             };
@@ -106,6 +105,7 @@
                 } else if (message.stop) {
                 }
             };
+            backsrvConn.send(JSON.stringify({msg: "ready"}));
             c.addEventListener('click', function (evt) {
                 let pos = getMousePos(c, evt);
                 showPosition({x: pos.x * k, y: pos.y * k});
