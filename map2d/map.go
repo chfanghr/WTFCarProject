@@ -9,16 +9,17 @@ import (
 
 const perGridSize = 0.01
 
+type Barrier struct {
+	Required [3]rpcprotocal.Point2D `json:"required"`
+	Optional []rpcprotocal.Point2D  `json:"optional"`
+}
 type Map2D struct {
 	Map struct {
 		Size struct {
 			X float64 `json:"x"`
 			Y float64 `json:"y"`
 		} `json:"size"`
-		Barriers []struct {
-			Required [3]rpcprotocal.Point2D `json:"required"`
-			Optional []rpcprotocal.Point2D  `json:"optional"`
-		} `json:"barriers"`
+		Barriers []Barrier `json:"barriers"`
 	} `json:"map"`
 }
 
