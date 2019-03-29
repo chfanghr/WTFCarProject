@@ -29,6 +29,7 @@ type message struct {
 func NewFakeCar(l *log.Logger, listenAddr string) *FakeCar {
 	res := &FakeCar{mu: new(sync.Mutex)}
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		r.Header.Del("Origin")
 		ws, err := res.upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			l.Println("error upgrade ws", err)
