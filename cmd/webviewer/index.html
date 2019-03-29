@@ -38,7 +38,7 @@
         ctx.stroke();
 
         let barriers = [];
-        for (let b of map.map.barriers) {
+        for (let b of map.barriers) {
             let barrier = [];
             for (let req of b.required) barrier.push(req);
             for (let opt of b.optional) barrier.push(opt);
