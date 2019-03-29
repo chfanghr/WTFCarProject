@@ -1,4 +1,4 @@
-package webviewer
+package main
 
 import (
 	"bytes"
