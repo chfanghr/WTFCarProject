@@ -36,7 +36,7 @@ jobs:
           command: cd build;cmake ../cmd/backsrv/backend_arduino/;make -j4
       - run:
           name: Collect Binary Files
-          command: cd build;cp backend_arduino.* simplecli client webviewer backsrv backsrv_arm /build
+          command: cd build;cp backend_arduino.* simplecli client webviewer backsrv backsrv_arm /build;cp ../cmd/webviewer/index.html /build
       - run:
           name: Pack Up Binary Files
           command: tar -cf build.tar /build;mv build.tar /build
