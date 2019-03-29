@@ -183,9 +183,11 @@ func processWebPage() {
 	if err = t.Execute(buf, struct {
 		MapData      string
 		FakeCarWSURL string
+		ClientWSURL  string
 	}{
 		string(mapData),
 		"ws://" + *fakeCarWSHost + "/",
+		"ws://" + *serveAddr + "ws",
 	}); err != nil {
 		logger.Fatalln(err)
 	}

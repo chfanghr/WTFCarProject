@@ -4,13 +4,13 @@
     <meta charset="UTF-8"/>
     <title>client</title>
 </head>
-
 <body>
 <canvas id="c"></canvas>
 <script>
     const k = 1000;
     let map = JSON.parse("{{.MapData}}");
-    let wsURL = "{{.FakeCarWSURL}}";
+    let backsrvWSURL = "{{.FakeCarWSURL}}";
+    let clientWSURL = "{{.ClientWSURL}}}";
     let c = document.getElementById("c");
     let ctx = c.getContext("2d");
     c.setAttribute("width", map.size.x * k);
@@ -62,6 +62,14 @@
         ctx.stroke();
     }
 
+    function getMousePos(canvas, event) {
+        let rect = canvas.getBoundingClientRect();
+        return {
+            x: (event.clientX - rect.left * (canvas.width / rect.width)) / k,
+            y: (event.clientY - rect.top * (canvas.height / rect.height)) / k
+        };
+    }
+
     function showPathTo(pos) {
         ctx.moveTo(pos.x, pos.y);
         ctx.strokeStyle = "#000";
@@ -69,16 +77,21 @@
         ctx.stroke();
     }
 
-    let conn;
+    let backsrvConn, clientConn;
 
     function main() {
         drawMap();
         if (window["WebSocket"]) {
-            conn = new WebSocket(wsURL);
-            conn.onclose = function (evt) {
+            backsrvConn = new WebSocket(backsrvWSURL);
+            backsrvConn.onclose = function (evt) {
                 throw Error("ws connection closed");
             };
-            conn.onmessage = function (evt) {
+            clientConn = new WebSocket(clientWSURL);
+            clientConn.onclose = function (evt) {
+                throw Error("ws connection closed");
+            };
+
+            backsrvConn.onmessage = function (evt) {
                 let message = JSON.parse(evt.data);
                 if (message.cur) {
                     message.cur.x = k * message.cur.x;
@@ -92,6 +105,11 @@
                 } else if (message.stop) {
                 }
             };
+            c.addEventListener('click', function (evt) {
+                let pos = getMousePos(c, evt);
+                showPosition({x: pos.x * k, y: pos.y * k});
+                clientConn.send(JSON.stringify(pos));
+            })
         }
     }
 
