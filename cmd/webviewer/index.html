@@ -41,7 +41,7 @@
         for (let b of map.barriers) {
             let barrier = [];
             for (let req of b.required) barrier.push(req);
-            for (let opt of b.optional) barrier.push(opt);
+            if (b.optional) for (let opt of b.optional) barrier.push(opt);
             barriers.push(barrier);
         }
         for (let b of barriers) drawBarrier(b);
@@ -105,7 +105,9 @@
                 } else if (message.stop) {
                 }
             };
-            backsrvConn.send(JSON.stringify({msg: "ready"}));
+            backsrvConn.onopen = function () {
+                backsrvConn.send(JSON.stringify({msg: "ready"}));
+            };
             c.addEventListener('click', function (evt) {
                 let pos = getMousePos(c, evt);
                 showPosition({x: pos.x * k, y: pos.y * k});
